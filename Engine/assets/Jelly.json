@@ -1,0 +1,17 @@
+{
+    "filepath":"./Jelly.bmp",
+      "format":{
+            "width" : 128,
+            "height": 192,
+            "tileWidth"	: 32,
+            "tileHeight": 32,
+      },
+      "frames":{
+            "idle": [0,1,2,3],
+            "idle_jump": [4,5,6,7],
+            "run_right": [8,9,10,11],
+            "jump_right": [12,13,14,15],
+            "run_left": [16,17,18,19],
+            "jump_left": [20,21,22,23],
+      }
+}
