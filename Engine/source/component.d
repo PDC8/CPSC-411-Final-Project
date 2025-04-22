@@ -78,6 +78,10 @@ class AnimatedTextureComponent : IComponent{
     long mCurrentFramePlaying ;   // Current frame that is playing, an index into 'mFrames'
     long mLastFrameInSequence;
 
+    // Time delay between frames
+    long mFrameDelay = 100; // 100ms
+    long mLastFrameTime = 0;
+
     this(GameObject owner, SDL_Renderer* r, string filename){
 		mOwner = owner;
         mFilename = filename;
@@ -94,21 +98,26 @@ class AnimatedTextureComponent : IComponent{
     // Play an animation based on the name of the animation sequence
     // specified in the data file.
     void LoopAnimationSequence(string name){
-        if (mCurrentAnimationName != name) {
-            mCurrentAnimationName = name;
-            mCurrentFramePlaying = mFrameNumbers[name][0];
-            mLastFrameInSequence = mFrameNumbers[name].back();
-        }
-        else{
-            auto temp = mCurrentFramePlaying;
-            if(mCurrentFramePlaying == mLastFrameInSequence){
-                mCurrentFramePlaying = mLastFrameInSequence - (mFrameNumbers[name].length - 1);
+        auto currentTime = SDL_GetTicks();
+
+        if(currentTime - mLastFrameTime > mFrameDelay) {
+            mLastFrameTime = currentTime;
+
+            if (mCurrentAnimationName != name) {
+                mCurrentAnimationName = name;
+                mCurrentFramePlaying = mFrameNumbers[name][0];
+                mLastFrameInSequence = mFrameNumbers[name].back();
             }
             else{
-                mCurrentFramePlaying += 1;
+                auto temp = mCurrentFramePlaying;
+                if(mCurrentFramePlaying == mLastFrameInSequence){
+                    mCurrentFramePlaying = mLastFrameInSequence - (mFrameNumbers[name].length - 1);
+                }
+                else{
+                    mCurrentFramePlaying += 1;
+                }
             }
         }
-
         // Get the current frame's rectangle (from sprite sheet)
         SDL_Rect currentFrameRect = mFrames[mCurrentFramePlaying].mRect;
 
