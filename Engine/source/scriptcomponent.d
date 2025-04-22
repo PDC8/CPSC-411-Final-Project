@@ -114,126 +114,107 @@ class PeanutButterScript : ScriptComponent{
     }
 }
 
-// class LaserScript : ScriptComponent {
-//     float speed = 5.0f;
-//     float lifeTime = 3.0f;
-//     float startTime = 0.0f;
-
-//     this(GameObject owner){
-// 		super(owner);
-//     }
-
-//     override void Update() {
-//         auto currentTime = SDL_GetTicks() / 1000.0f;
-//         if(currentTime - startTime > lifeTime){
-//             mOwner.isActive = false;
-//         }
-
-//         auto transform = mOwner.getComponent!TransformComponent();
-
-//         float transformRad = transform.angle * (PI / 180.0f);
-
-//         auto dx = (sin(transformRad) * speed).to!int;
-//         auto dy = (cos(transformRad) * speed).to!int;
-
-//         transform.x += dx;
-//         transform.y -= dy;
-//     }
-
-//     override void Render(){
-//         auto animated = mOwner.getComponent!AnimatedTextureComponent();
-//         if(animated is null){
-//             return;
-//         }
-//         else{
-//             animated.StillAnimation("laser");
-//         }
-//     }
-
-//     void autoPool(){
-//         startTime = SDL_GetTicks() / 1000.0f;
-//     }
-// }
 
 
-// class PoolManagerScript : ScriptComponent {
-//     LaserPool laserPool;
-//     this(GameObject owner, LaserPool laserPool){
-// 		super(owner);
-//         this.laserPool = laserPool;
-//     }
 
-//     override void Update() {
-//         foreach(laser; laserPool.lasers){
-//             laser.Update();
-//         }
-//     }
+class JellyScript : ScriptComponent{
+    int h_velocity = 0;
+    int h_acceleration = 1;
+    int h_friction = 1;
+    int h_maxSpeed = 2;
 
-//     override void Render(){
-//         foreach(laser; laserPool.lasers){
-//             laser.Render();
-//         }
-//     }
-// }
+    int v_velocity = 0;
+    int jumpVelocity = -5;
+    int gravity = 1;
+    int v_maxSpeed = 5;
 
-// class AsteroidScript : ScriptComponent{
-//     int speed;
-//     int size;
-//     int type;
-//     float dir;
-//     this(GameObject owner, int speed, int size, int asteroidType, int direction, int rotation){
-// 		super(owner);
-//         this.speed = speed;
-//         this.size = size;
-//         type = asteroidType;
-//         dir = direction * (PI / 180.0f);
 
-//         //set asteroid rotation
-//         auto transform = mOwner.getComponent!TransformComponent();
-//         transform.angle = rotation;
-//     }
+    bool isJump = false;
+    int direction = 0; //0: for idle, -1: for left, 1: for right
 
-//     override void Update() {
-//         if(size <= 8){
-//             mOwner.isActive = false;
-//         }
+    int dx;
+    int dy;
 
-//         auto transform = mOwner.getComponent!TransformComponent();
+    this(GameObject owner){
+		super(owner);
+    }
+    override void Input(){
+        ubyte* keystate = SDL_GetKeyboardState(null);
 
-//         auto dx = (sin(dir) * speed).to!int;
-//         auto dy = (cos(dir) * speed).to!int;
+        if(keystate[SDL_SCANCODE_LEFT]){
+            direction = -1;
+            h_velocity += h_acceleration;
+        }
+        else if(keystate[SDL_SCANCODE_RIGHT]){
+            direction = 1;
+            h_velocity += h_acceleration;
+        }
+        if (keystate[SDL_SCANCODE_UP]){
+            v_velocity = jumpVelocity;
+            isJump = true;
+        }	
+    }
+    override void Update(){
+        auto transform = mOwner.getComponent!TransformComponent();
+        if(transform !is null){
 
-//         transform.x += dx;
-//         transform.y -= dy;
+            if (direction == 0) {
+                h_velocity -= h_friction;
+                if (h_velocity < 0) h_velocity = 0;
+            }
+            h_velocity = min(h_velocity, h_maxSpeed);
 
-//         // Wrap around screen boundaries
-//         transform.x = ((transform.x % 1920) + 1920) % 1920;
-//         transform.y = ((transform.y % 1080) + 1080) % 1080;
-//     }
+            v_velocity += gravity;
+            v_velocity = min(v_velocity, v_maxSpeed);
+            
+            // Temporary ground check- TODO: change later when platorm tiling is implemented
+            if (transform.y > 100) {
+                transform.y = 100;
+                v_velocity = 0;
+            }
 
-//     override void Render(){
-//         auto animated = mOwner.getComponent!AnimatedTextureComponent();
-//         if(animated is null){
-//             return;
-//         }
-//         else{
-//             if(type){
-//                 animated.StillAnimation("asteroid1");
-//             }
-//             else{
-//                 animated.StillAnimation("asteroid2");
-//             }
-//         }
-//     }
+            dx = direction * h_velocity;
+            dy = v_velocity;
+            transform.x += dx;
+            transform.y += dy;
+        }
+    }
+    override void Render(){
+        auto animated = mOwner.getComponent!AnimatedTextureComponent();
+        if(animated is null){
+            return;
+        }
+        else{
+            if(direction == 0){
+                if(isJump){
+                    animated.LoopAnimationSequence("j_idle_jump");
+                }
+                else{
+                    animated.LoopAnimationSequence("j_idle");
+                }
+            }
+            else if(direction == -1){
+                if(isJump){
+                    animated.LoopAnimationSequence("j_jump_left");
+                }
+                else{
+                    animated.LoopAnimationSequence("j_run_left");
+                }
+            }
+            else if(direction == 1){
+                if(isJump){
+                    animated.LoopAnimationSequence("j_jump_right");
+                }
+                else{
+                    animated.LoopAnimationSequence("j_run_right");
+                }
+            }
+            isJump = false;
+            direction = 0;
 
-//     void split(){
-//         size /= 2;
-
-//         auto transform = mOwner.getComponent!TransformComponent();
-//         transform.w /= 2;
-//         transform.h /= 2;
-//     }
-// }
+        }
+    }
+}
 
 // class CameraScript : ScriptComponent{
 //     GameObject mTarget;

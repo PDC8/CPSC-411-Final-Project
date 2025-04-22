@@ -99,7 +99,7 @@ class Level1 : Scene{
         jelly.addComponent(new TransformComponent(jelly, J_X, J_Y, 32, 32));
         jelly.addComponent(new TextureComponent(jelly, renderer, image));
         jelly.addComponent(new AnimatedTextureComponent(jelly, renderer, data));
-        // jelly.addComponent(new SpaceShipScript(jelly, laserPool));
+        jelly.addComponent(new JellyScript(jelly));
         rootNode.addChild(jelly);
 
         // //collision manager
