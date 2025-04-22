@@ -1,0 +1,12 @@
+{
+	"authors": [
+		"Peidong Chen"
+	],
+	"copyright": "Copyright © 2025, Peidong Chen",
+	"dependencies": {
+		"bindbc-sdl": "~>2.1.0"
+	},
+	"description": "A simple SDL2 game engine game",
+	"license": "proprietary",
+	"name": "prog_sdl"
+}
