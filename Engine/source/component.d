@@ -79,7 +79,7 @@ class AnimatedTextureComponent : IComponent{
     long mLastFrameInSequence;
 
     // Time delay between frames
-    long mFrameDelay = 100; // 100ms
+    long mFrameDelay = 150; // 100ms
     long mLastFrameTime = 0;
 
     this(GameObject owner, SDL_Renderer* r, string filename){

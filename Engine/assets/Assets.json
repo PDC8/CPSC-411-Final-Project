@@ -1,8 +1,8 @@
 {
-    "filepath":"./Players.bmp",
+    "filepath":"./Assets.bmp",
       "format":{
             "width" : 128,
-            "height": 384,
+            "height": 416,
             "tileWidth"	: 32,
             "tileHeight": 32,
       },
@@ -19,5 +19,7 @@
             "p_jump_right": [36,37,38,39],
             "p_run_left": [40,41,42,43],
             "p_jump_left": [44,45,46,47],
+            "play_button_1": [48],
+            "play_button_2": [49],
       }
 }

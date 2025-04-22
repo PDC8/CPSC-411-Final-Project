@@ -14,9 +14,9 @@ class SceneManager{
     }
 
     void initSceneManager(){
-        // Scene mainMenuScene = new MainMenu(renderer, this, "./assets/AsteroidGame.bmp", "./assets/AsteroidGame.json");
-        Scene level1Scene = new Level1(renderer, this, "./assets/Players.bmp", "./assets/Players.json");
-        // this.addScene("Main Menu", mainMenuScene);
+        Scene mainMenuScene = new MainMenu(renderer, this, "./assets/Assets.bmp", "./assets/Assets.json");
+        Scene level1Scene = new Level1(renderer, this, "./assets/Assets.bmp", "./assets/Assets.json");
+        this.addScene("Main Menu", mainMenuScene);
         this.addScene("Level 1", level1Scene);
     }
 

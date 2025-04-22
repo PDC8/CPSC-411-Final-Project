@@ -22,9 +22,9 @@ class PeanutButterScript : ScriptComponent{
     int h_maxSpeed = 2;
 
     int v_velocity = 0;
-    int jumpVelocity = -5;
+    int jumpVelocity = -15;
     int gravity = 1;
-    int v_maxSpeed = 5;
+    int v_maxSpeed = 10;
 
 
     bool isJump = false;
@@ -48,6 +48,9 @@ class PeanutButterScript : ScriptComponent{
             h_velocity += h_acceleration;
         }
         if (keystate[SDL_SCANCODE_W]){
+            if(isJump){
+                return;
+            }
             v_velocity = jumpVelocity;
             isJump = true;
         }	
@@ -69,6 +72,7 @@ class PeanutButterScript : ScriptComponent{
             if (transform.y > 100) {
                 transform.y = 100;
                 v_velocity = 0;
+                isJump = false;
             }
 
             dx = direction * h_velocity;
@@ -107,10 +111,8 @@ class PeanutButterScript : ScriptComponent{
                     animated.LoopAnimationSequence("p_run_right");
                 }
             }
-            isJump = false;
-            direction = 0;
-
         }
+        direction = 0;
     }
 }
 
@@ -246,49 +248,49 @@ class JellyScript : ScriptComponent{
 //     }
 // }
 
-// class ButtonScript : ScriptComponent{
-//     private bool hover;
-//     private bool click;
-//     private SceneManager sceneManager;
-//     this(GameObject owner, SceneManager sceneManager){
-//         super(owner);
-//         this.sceneManager = sceneManager;
-//     }
+class ButtonScript : ScriptComponent{
+    private bool hover;
+    private bool click;
+    private SceneManager sceneManager;
+    this(GameObject owner, SceneManager sceneManager){
+        super(owner);
+        this.sceneManager = sceneManager;
+    }
 
-//     override void Input(){
-//         int x;
-//         int y;
-//         uint mousestate = SDL_GetMouseState(&x, &y);
+    override void Input(){
+        int x;
+        int y;
+        uint mousestate = SDL_GetMouseState(&x, &y);
 
-//         auto transform = mOwner.getComponent!TransformComponent();
-//         hover = (transform.x <= x &&
-//                  x <= transform.x + transform.w && 
-//                  transform.y <= y &&
-//                  y <= transform.y + transform.h);
-//         click = hover && (mousestate & (1 << (SDL_BUTTON_LEFT - 1)));
-//     }
+        auto transform = mOwner.getComponent!TransformComponent();
+        hover = (transform.x <= x &&
+                 x <= transform.x + transform.w && 
+                 transform.y <= y &&
+                 y <= transform.y + transform.h);
+        click = hover && (mousestate & (1 << (SDL_BUTTON_LEFT - 1)));
+    }
 
-//     override void Update(){
-//         if(click){
-//             sceneManager.switchScene("Level 1");
-//         }
-//     }
+    override void Update(){
+        if(click){
+            sceneManager.switchScene("Level 1");
+        }
+    }
 
-//     override void Render(){
-//         auto animated = mOwner.getComponent!AnimatedTextureComponent();
-//         if(animated is null){
-//             return;
-//         }
-//         else{
-//             if(hover){
-//                 animated.StillAnimation("playButton2");
-//             }
-//             else{
-//                 animated.StillAnimation("playButton1");
-//             }
-//         }
-//     }
-// }
+    override void Render(){
+        auto animated = mOwner.getComponent!AnimatedTextureComponent();
+        if(animated is null){
+            return;
+        }
+        else{
+            if(hover){
+                animated.StillAnimation("play_button_2");
+            }
+            else{
+                animated.StillAnimation("play_button_1");
+            }
+        }
+    }
+}
 
 // class CollisionManagerScript : ScriptComponent {
 //     GameObject spaceShip;

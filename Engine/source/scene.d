@@ -13,39 +13,39 @@ abstract class Scene{
     void setUpScene(string image, string data);
 }
 
-// class MainMenu : Scene{
-//     immutable int size = 200;
-//     int buttonX = 320 - (size / 2);
-//     int buttonY = 240 - (size / 2);
-//     this(SDL_Renderer* renderer, SceneManager sceneManager, string image, string data){
-//         super(renderer, sceneManager);
-//         setUpScene(image, data);
-//     }
+class MainMenu : Scene{
+    immutable int size = 200;
+    int buttonX = 320 - (size / 2);
+    int buttonY = 240 - (size / 2);
+    this(SDL_Renderer* renderer, SceneManager sceneManager, string image, string data){
+        super(renderer, sceneManager);
+        setUpScene(image, data);
+    }
 
-//     override void setUpScene(string image, string data){
+    override void setUpScene(string image, string data){
 
-//         //make our root node for scene tree
-//         GameObject rootNode = new GameObject();
-//         tree.setRoot(rootNode);
+        //make our root node for scene tree
+        GameObject rootNode = new GameObject();
+        tree.setRoot(rootNode);
 
-//         // //background object
-//         // GameObject bg = new GameObject();
-//         // bg.addComponent(new TransformComponent(bg, 0, 0, 640, 640));
-//         // bg.addComponent(new TextureComponent(bg, renderer, "./assets/Background.bmp"));
-//         // bg.addComponent(new AnimatedTextureComponent(bg, renderer, "./assets/Background.json"));
-//         // bg.addComponent(new BgScript(bg));
-//         // rootNode.addChild(bg);
+        // //background object
+        // GameObject bg = new GameObject();
+        // bg.addComponent(new TransformComponent(bg, 0, 0, 640, 640));
+        // bg.addComponent(new TextureComponent(bg, renderer, "./assets/Background.bmp"));
+        // bg.addComponent(new AnimatedTextureComponent(bg, renderer, "./assets/Background.json"));
+        // bg.addComponent(new BgScript(bg));
+        // rootNode.addChild(bg);
 
 
-//         //play button object
-//         GameObject playButton = new GameObject();
-//         playButton.addComponent(new TransformComponent(playButton, buttonX, buttonY, size, size));
-//         playButton.addComponent(new TextureComponent(playButton, renderer, image));
-//         playButton.addComponent(new AnimatedTextureComponent(playButton, renderer, data));
-//         playButton.addComponent(new ButtonScript(playButton, sceneManager));
-//         rootNode.addChild(playButton);
-//     }
-// }
+        //play button object
+        GameObject playButton = new GameObject();
+        playButton.addComponent(new TransformComponent(playButton, buttonX, buttonY, size, size));
+        playButton.addComponent(new TextureComponent(playButton, renderer, image));
+        playButton.addComponent(new AnimatedTextureComponent(playButton, renderer, data));
+        playButton.addComponent(new ButtonScript(playButton, sceneManager));
+        rootNode.addChild(playButton);
+    }
+}
 
 
 class Level1 : Scene{

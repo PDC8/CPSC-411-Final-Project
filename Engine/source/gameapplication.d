@@ -81,7 +81,7 @@ struct GameApplication{
 
     void RunLoop(){
         // Main application loop
-        sceneManager.switchScene("Level 1");
+        sceneManager.switchScene("Main Menu");
         while(mGameIsRunning){
             AdvanceFrame();	
         }
