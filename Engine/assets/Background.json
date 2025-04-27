@@ -1,0 +1,12 @@
+{
+    "filepath":"./Assets.bmp",
+      "format":{
+            "width" : 604,
+            "height": 340,
+            "tileWidth"	: 604,
+            "tileHeight": 340,
+      },
+      "frames":{
+            "background": [0]
+      }
+}

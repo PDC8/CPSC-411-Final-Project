@@ -31,6 +31,7 @@ class MainMenu : Scene{
         GameObject rootNode = new GameObject();
         tree.setRoot(rootNode);
 
+<<<<<<< HEAD
         // //background object
         // GameObject bg = new GameObject();
         // bg.addComponent(new TransformComponent(bg, 0, 0, 640, 640));
@@ -38,6 +39,15 @@ class MainMenu : Scene{
         // bg.addComponent(new AnimatedTextureComponent(bg, renderer, "./assets/Background.json"));
         // bg.addComponent(new BgScript(bg));
         // rootNode.addChild(bg);
+=======
+        //background object
+        GameObject bg = new GameObject();
+        bg.addComponent(new TransformComponent(bg, 0, 0, 1136, 640));
+        bg.addComponent(new TextureComponent(bg, renderer, "./assets/Background.bmp"));
+        bg.addComponent(new AnimatedTextureComponent(bg, renderer, "./assets/Background.json"));
+        bg.addComponent(new BgScript(bg));
+        rootNode.addChild(bg);
+>>>>>>> a10a7d6 (added background and placeholder code for collision)
 
         //play button object
         GameObject playButton = new GameObject();
@@ -77,6 +87,7 @@ class Level1 : Scene{
                     tileObj.addComponent(new TransformComponent(tileObj, c * TILESIZE, r * TILESIZE, TILESIZE, TILESIZE));
                     tileObj.addComponent(new TextureComponent(tileObj,renderer, image));
 
+<<<<<<< HEAD
                     tileObj.addComponent(new AnimatedTextureComponent(tileObj, renderer, data));
                     tileObj.addComponent(new TileScript(tileObj, t));
 
@@ -106,6 +117,15 @@ class Level1 : Scene{
         // worldContainer.addComponent(new WorldContainerScript(worldContainer));
         // camera.addChild(worldContainer);
 
+=======
+        //background object
+        GameObject bg = new GameObject();
+        bg.addComponent(new TransformComponent(bg, 0, 0, 1136, 640));
+        bg.addComponent(new TextureComponent(bg, renderer, "./assets/Background.bmp"));
+        bg.addComponent(new AnimatedTextureComponent(bg, renderer, "./assets/Background.json"));
+        bg.addComponent(new BgScript(bg));
+        rootNode.addChild(bg);
+>>>>>>> a10a7d6 (added background and placeholder code for collision)
 
         //set up peanut butter object
         GameObject peanutButter = new GameObject();
@@ -123,9 +143,10 @@ class Level1 : Scene{
         jelly.addComponent(new JellyScript(jelly));
         rootNode.addChild(jelly);
 
-        // //collision manager
+
+        //collision manager
         // GameObject collisionManager = new GameObject();
-        // collisionManager.addComponent(new CollisionManagerScript(collisionManager, spaceShip, laserPool, asteroidContainer));
+        // collisionManager.addComponent(new CollisionManagerScript(collisionManager, peanutButter, jelly, tilesContainer));
         // rootNode.addChild(collisionManager);
 
         // //game manager

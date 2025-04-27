@@ -309,74 +309,68 @@ class TileScript : ScriptComponent {
     }
 }
 
-// class CollisionManagerScript : ScriptComponent {
-//     GameObject spaceShip;
-//     LaserPool laserPool;
-//     GameObject asteroidContainer;
+class CollisionManagerScript : ScriptComponent {
+    GameObject peanutButter;
+    GameObject jelly;
+    GameObject tilesContainer;
 
-//     this(GameObject owner, GameObject spaceShip, LaserPool laserPool, GameObject asteroidContainer) {
-//         super(owner);
-//         this.spaceShip = spaceShip;
-//         this.laserPool = laserPool;
-//         this.asteroidContainer = asteroidContainer;
-//     }
+    this(GameObject owner, GameObject peanutButter, GameObject jelly, GameObject tilesContainer) {
+        super(owner);
+        this.peanutButter = peanutButter;
+        this.jelly = jelly;
+        this.tilesContainer = tilesContainer;
+    }
 
-//     override void Update() {
-//         // Laser-Asteroid Collisions
-//         foreach(laser; laserPool.lasers) {
-//             if(laser.isActive) {
-//                 foreach(asteroid; asteroidContainer.children) {
-//                     if(asteroid.isActive) {
-//                         if(checkCollision(laser, asteroid)) {
-//                             laser.isActive = false;
-//                             asteroid.getComponent!AsteroidScript.split();
-//                         }
-//                     }
-//                 }
-//             }
-//         }
-//         // Spaceship-Asteroid Collisions
-//         foreach(asteroid; asteroidContainer.children){
-//             if(asteroid.isActive){
-//                 foreach(laser; laserPool.lasers){
-//                     if(laser.isActive){
-//                         if(checkCollision(laser, asteroid)){
-//                             laser.isActive = false;
-//                             asteroid.isActive = false;
-//                         }
-//                     }
-//                 }
+    override void Update() {
+        // peanutButter tile collisions
+        foreach(tile; tilesContainer.children){
+            if(tile.isActive){
+                auto transform = peanutButter.getComponent!TransformComponent();
+                auto tileTransform = tile.getComponent!TransformComponent();
+                auto tileType = tile.getComponent!TileScript().tileType;
+                if(checkCollision(peanutButter, tile)){
+                    if(tileType == "ground"){
+                        // peanutButter is on top of tile
+                        transform.y = tileTransform.y - transform.h;
+                        peanutButter.getComponent!PeanutButterScript().v_velocity = 0;
+                        peanutButter.getComponent!PeanutButterScript().isJump = false;
+                    }
+                    else if(tileType == "obstacle"){ // obstacle tile
+                        
+                    }
+                    else if(tileType == "ladder") //ladder tile
+                }
+            }
+        }
+        // peanutButter-jelly Collisions
+        if(checkCollision(peanutButter, jelly)){
+            //do something
+        }
+    }
 
-//                 if(checkCollision(spaceShip, asteroid)){
-//                     spaceShip.isActive = false;
-//                 }
-//             }
-//         }
-//     }
+    bool checkCollision(GameObject obj1, GameObject obj2){
+        auto transform1 = obj1.getComponent!TransformComponent();
+        auto transform2 = obj2.getComponent!TransformComponent();
 
-//     bool checkCollision(GameObject obj1, GameObject obj2){
-//         auto transform1 = obj1.getComponent!TransformComponent();
-//         auto transform2 = obj2.getComponent!TransformComponent();
+        return SDL_HasIntersection(&transform1.mRectangle, &transform2.mRectangle) == SDL_TRUE;
+    }
+}
 
-//         return SDL_HasIntersection(&transform1.mRectangle, &transform2.mRectangle) == SDL_TRUE;
-//     }
-// }
+class BgScript : ScriptComponent{
+    this(GameObject owner){
+        super(owner);
+    }
 
-// class BgScript : ScriptComponent{
-//     this(GameObject owner){
-//         super(owner);
-//     }
-
-//     override void Render(){
-//         auto animated = mOwner.getComponent!AnimatedTextureComponent();
-//         if(animated is null){
-//             return;
-//         }
-//         else{
-//             animated.StillAnimation("background");
-//         }
-//     }
-// }
+    override void Render(){
+        auto animated = mOwner.getComponent!AnimatedTextureComponent();
+        if(animated is null){
+            return;
+        }
+        else{
+            animated.StillAnimation("background");
+        }
+    }
+}
 
 // class GameManagerScript : ScriptComponent {
 //     GameObject spaceShip;

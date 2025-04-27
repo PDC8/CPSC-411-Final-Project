@@ -13,8 +13,6 @@ class TransformComponent : IComponent{
     alias mRectangle this;
 
     float angle = 0.0;
-    // bool isRotate = false;
-    // int duration = 24;
 
     this(GameObject owner, int _x, int _y, int _w, int _h){
         mOwner = owner;
@@ -73,7 +71,7 @@ class AnimatedTextureComponent : IComponent{
     TransformComponent mTransformRef;
 
     // Stateful information about the current animation
-    // sequene that is playing
+    // Sequene that is playing
     string mCurrentAnimationName; // Which animation is currently playing
     long mCurrentFramePlaying ;   // Current frame that is playing, an index into 'mFrames'
     long mLastFrameInSequence;
