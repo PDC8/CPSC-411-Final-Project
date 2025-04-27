@@ -2,7 +2,7 @@
     "filepath":"./Assets.bmp",
       "format":{
             "width" : 128,
-            "height": 448,
+            "height": 640,
             "tileWidth"	: 32,
             "tileHeight": 32,
       },
@@ -23,6 +23,12 @@
             "play_button_2": [49],
             "ground":   [52],
             "ladder":   [53],
-            "obstacle": [54]
+            "obstacle": [54],
+            "pbj_idle": [55, 56, 57, 58],
+            "pbj_idle_jump": [59, 60, 61, 62],
+            "pbj_run_right": [63, 64, 65, 66],
+            "pbj_jump_right": [67, 68, 69, 70],
+            "pbj_run_left": [71, 72, 73, 74],
+            "pbj_jump_left": [75, 76, 77, 78],
       }
 }
