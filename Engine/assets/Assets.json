@@ -2,7 +2,7 @@
     "filepath":"./Assets.bmp",
       "format":{
             "width" : 128,
-            "height": 416,
+            "height": 448,
             "tileWidth"	: 32,
             "tileHeight": 32,
       },
@@ -21,5 +21,8 @@
             "p_jump_left": [44,45,46,47],
             "play_button_1": [48],
             "play_button_2": [49],
+            "ground":   [52],
+            "ladder":   [53],
+            "obstacle": [54]
       }
 }
