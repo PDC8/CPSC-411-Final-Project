@@ -16,8 +16,12 @@ class SceneManager{
     void initSceneManager(){
         Scene mainMenuScene = new MainMenu(renderer, this, "./assets/Assets.bmp", "./assets/Assets.json");
         Scene level1Scene = new Level1(renderer, this, "./assets/Assets.bmp", "./assets/Assets.json");
+        Scene winScene = new Win(renderer, this, "./assets/Assets.bmp", "./assets/Assets.json");
+        Scene gameOverScene = new GameOver(renderer, this, "./assets/Assets.bmp", "./assets/Assets.json");
         this.addScene("Main Menu", mainMenuScene);
         this.addScene("Level 1", level1Scene);
+        this.addScene("Win", winScene);
+        this.addScene("Game Over", gameOverScene);
     }
 
     void switchScene(string sceneName){

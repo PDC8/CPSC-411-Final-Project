@@ -22,7 +22,7 @@ class MovementScript : ScriptComponent{
     int h_maxSpeed = 2;
 
     int v_velocity = 0;
-    int jumpVelocity = -15;
+    int jumpVelocity = -12;
     int gravity = 1;
     int v_maxSpeed = 5;
 
@@ -42,6 +42,7 @@ class MovementScript : ScriptComponent{
 class PeanutButterScript : MovementScript{
     this(GameObject owner){
 		super(owner);
+        this.jumpVelocity = -12;
     }
     override void Input(){
         ubyte* keystate = SDL_GetKeyboardState(null);
@@ -120,6 +121,7 @@ class PeanutButterScript : MovementScript{
 class JellyScript : MovementScript{
     this(GameObject owner){
 		super(owner);
+        this.jumpVelocity = -12;
     }
     override void Input(){
         ubyte* keystate = SDL_GetKeyboardState(null);
@@ -197,6 +199,7 @@ class JellyScript : MovementScript{
 class MergedPeanutButterJellyScript : MovementScript{
     this(GameObject owner){
 		super(owner);
+        this.jumpVelocity = -15;
     }
     override void Input(){
         ubyte* keystate = SDL_GetKeyboardState(null);
@@ -339,13 +342,18 @@ class CollisionManagerScript : ScriptComponent {
     bool isMerged = false;
     bool isSpacePressed = false;
     uint prevTransitionTime = 0;
+    Level1 level1Scene;
+    int starCount; 
+    int playerCount = 2;
 
-    this(GameObject owner, GameObject peanutButter, GameObject jelly, GameObject mergedPeanutButterJelly, GameObject tilesContainer) {
+    this(GameObject owner, GameObject peanutButter, GameObject jelly, GameObject mergedPeanutButterJelly, GameObject tilesContainer, Level1 level1Scene, int starCount) {
         super(owner);
         this.peanutButter = peanutButter;
         this.jelly = jelly;
         this.mergedPeanutButterJelly = mergedPeanutButterJelly;
         this.tilesContainer = tilesContainer;
+        this.level1Scene = level1Scene;
+        this.starCount = starCount; 
     }
 
     override void Input() {
@@ -428,20 +436,35 @@ class CollisionManagerScript : ScriptComponent {
 
                 else if(tileType == "jelly_ground"){ //jelly tile
                     groundTile(player, tile, playerScript);
-                    if(player.id == 0){ //peanut butter
+                    if(player.id != 1){ //peanut butter
                         playerScript.h_velocity = 0;
                         playerScript.isJump = true;
                     }
                 }
                 else if (tileType == "pb_ground"){ //pb tile
                     groundTile(player, tile, playerScript);
-                    if(player.id == 1){ //jelly
+                    if(player.id != 0){ //jelly
                         playerScript.h_velocity = 0;
                         playerScript.isJump = true;
                     }
                 }
                 else if(tileType == "obstacle"){ //obstacle tile
+                    if(player.isActive) {
+                        playerCount -= 1;
+                        if(playerCount == 0) {
+                            SceneManager.currentScene.gameOver = true;
+                        }
+                    }
                     player.isActive = false;
+                } else if(tileType == "star") { //star tile
+                    if(tile.isActive) {
+                        starCount -= 1; 
+                        if(starCount == 0) {
+                            SceneManager.currentScene.win = true;
+                            SceneManager.currentScene.gameOver = true;
+                        }
+                    }
+                    tile.isActive = false; 
                 }
             }
         }
@@ -490,39 +513,3 @@ class BgScript : ScriptComponent{
         }
     }
 }
-
-
-
-
-// class GameManagerScript : ScriptComponent {
-//     GameObject spaceShip;
-//     LaserPool laserPool;
-//     GameObject asteroidContainer;
-//     Scene scene;
-
-//     this(GameObject owner, GameObject spaceShip, LaserPool laserPool, GameObject asteroidContainer, Scene scene) {
-//         super(owner);
-//         this.spaceShip = spaceShip;
-//         this.laserPool = laserPool;
-//         this.asteroidContainer = asteroidContainer;
-//         this.scene = scene;
-//     }
-
-//     override void Update() {
-//         //if spaceship is inactive
-//         if(!spaceShip.isActive){
-//             scene.gameOver = true;
-//             writeln("Spaceship destroyed!");
-//         }
-//         int count = 0;
-//         foreach(asteroid; asteroidContainer.children){
-//             if(!asteroid.isActive){
-//                 count += 1;
-//             }
-//         }
-//         if(count == asteroidContainer.children.length){
-//             scene.gameOver = true;
-//             writeln("All asteroids destroyed!");
-//         }
-//     }
-// }

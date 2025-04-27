@@ -1,8 +1,5 @@
 import bindbc.sdl, std.random, std.stdio;
 import scenetree, gameobject, component, scriptcomponent, scenemanager;
-import resourcemanager;
-
-enum TILESIZE = 32; 
 
 abstract class Scene{
     SceneTree tree;
@@ -129,8 +126,6 @@ class Level1 : Scene{
         peanutButter.addComponent(new TextureComponent(peanutButter, renderer, image));
         peanutButter.addComponent(new AnimatedTextureComponent(peanutButter, renderer, data));
         peanutButter.addComponent(new PeanutButterScript(peanutButter));
-        peanutButter.scriptType = "PeanutButterScript"; // set script type for peanut butter
-        peanutButter.id = 0; // set id for peanut butter
         rootNode.addChild(peanutButter);
         
         //set up jelly object
@@ -139,32 +134,13 @@ class Level1 : Scene{
         jelly.addComponent(new TextureComponent(jelly, renderer, image));
         jelly.addComponent(new AnimatedTextureComponent(jelly, renderer, data));
         jelly.addComponent(new JellyScript(jelly));
-        jelly.scriptType = "JellyScript"; // set script type for jelly
-        jelly.id = 1; // set id for jelly
         rootNode.addChild(jelly);
 
-        //set up merged peanut butter jelly object
-        GameObject mergedPeanutButterJelly = new GameObject();
-        mergedPeanutButterJelly.addComponent(new TransformComponent(mergedPeanutButterJelly, J_X, J_Y, 32, 32));
-        mergedPeanutButterJelly.addComponent(new TextureComponent(mergedPeanutButterJelly, renderer, image));
-        mergedPeanutButterJelly.addComponent(new AnimatedTextureComponent(mergedPeanutButterJelly, renderer, data));
-        mergedPeanutButterJelly.addComponent(new MergedPeanutButterJellyScript(mergedPeanutButterJelly));
-        mergedPeanutButterJelly.isActive = false; // set to invisible at the start!
-        mergedPeanutButterJelly.scriptType = "MergedPeanutButterJellyScript"; // set script type for merged peanut butter jelly
-        rootNode.addChild(mergedPeanutButterJelly);
 
-
-        // // uncomment to enable feature where peanut butter and jelly can "merge" by pressing space key
-        // // merge manager
-        // GameObject mergeManager = new GameObject();
-        // mergeManager.addComponent(new MergeManagerScript(mergeManager, peanutButter, jelly, mergedPeanutButterJelly));
-        // rootNode.addChild(mergeManager);
-
-
-        // collision manager
-        GameObject collisionManager = new GameObject();
-        collisionManager.addComponent(new CollisionManagerScript(collisionManager, peanutButter, jelly, mergedPeanutButterJelly, tilesContainer));
-        rootNode.addChild(collisionManager);
+        //collision manager
+        // GameObject collisionManager = new GameObject();
+        // collisionManager.addComponent(new CollisionManagerScript(collisionManager, peanutButter, jelly, tilesContainer));
+        // rootNode.addChild(collisionManager);
 
         // //game manager
         // GameObject gameManager = new GameObject();

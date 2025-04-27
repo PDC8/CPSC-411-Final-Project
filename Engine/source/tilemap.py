@@ -181,8 +181,8 @@ class TileMapEditor:
 
 def main():
     # specify your game screen resolution (pixels)
-    SCREEN_WIDTH = 640
-    SCREEN_HEIGHT = 480
+    SCREEN_WIDTH = 800
+    SCREEN_HEIGHT = 640
     root = tk.Tk()
     TileMapEditor(root, SCREEN_WIDTH, SCREEN_HEIGHT)
     root.mainloop()
