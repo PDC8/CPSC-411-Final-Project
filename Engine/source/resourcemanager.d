@@ -9,11 +9,42 @@ class ResourceManager{
         long[][string] mFrameNumbers;
     }
 
+    struct TileMap {
+        int width;
+        int height;
+        string[][] tiles;
+    }
+
     static ResourceManager GetInstance(){
         if(mInstance is null){
             mInstance = new ResourceManager();
         }
         return mInstance;
+    }
+
+    static TileMap LoadTileMap(string filename) {
+        auto file    = File(filename, "r");
+        auto content = file.byLine.joiner("\n");
+        auto j       = parseJSON(content);
+
+        TileMap mapData;
+        mapData.width  = j["width"].integer.to!int;
+        mapData.height = j["height"].integer.to!int;
+
+        auto rows = j["tiles"].array;
+        mapData.tiles = new string[][](mapData.height);
+
+        foreach(r, rowVal; rows) {
+            auto cols = rowVal.array;
+            mapData.tiles[r] = new string[](cols.length);
+            foreach(c, cellVal; cols) {
+                if (cellVal.type == JSONType.NULL)
+                    mapData.tiles[r][c] = "";
+                else
+                    mapData.tiles[r][c] = cellVal.str; 
+            }
+        }
+        return mapData;
     }
 
     // static Music LoadMusic(string filename){

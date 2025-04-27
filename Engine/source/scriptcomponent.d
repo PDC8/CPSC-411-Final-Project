@@ -292,6 +292,23 @@ class ButtonScript : ScriptComponent{
     }
 }
 
+
+class TileScript : ScriptComponent {
+    private string tileType;
+    this(GameObject owner, string tileType) {
+        super(owner);
+        this.tileType = tileType;
+    }
+
+    override void Render() {
+        auto animated = mOwner.getComponent!AnimatedTextureComponent();
+        if(animated is null){
+            return;
+        }
+        animated.StillAnimation(tileType);
+    }
+}
+
 // class CollisionManagerScript : ScriptComponent {
 //     GameObject spaceShip;
 //     LaserPool laserPool;

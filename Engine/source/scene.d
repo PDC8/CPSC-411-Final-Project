@@ -1,5 +1,8 @@
 import bindbc.sdl, std.random, std.stdio;
 import scenetree, gameobject, component, scriptcomponent, scenemanager;
+import resourcemanager;
+
+enum TILESIZE = 32; 
 
 abstract class Scene{
     SceneTree tree;
@@ -36,7 +39,6 @@ class MainMenu : Scene{
         // bg.addComponent(new BgScript(bg));
         // rootNode.addChild(bg);
 
-
         //play button object
         GameObject playButton = new GameObject();
         playButton.addComponent(new TransformComponent(playButton, buttonX, buttonY, size, size));
@@ -62,7 +64,24 @@ class Level1 : Scene{
         //make our root node for scene tree
         GameObject rootNode = new GameObject();
         tree.setRoot(rootNode);
+        
+        auto tm = ResourceManager.GetInstance().LoadTileMap("./assets/maps/map.json");
+        foreach(r; 0 .. tm.height) {
+            foreach(c; 0 .. tm.width) {
+                auto t = tm.tiles[r][c];
+                string texFile;
+                if (t != "") {
+                    GameObject tileObj = new GameObject();
+                    tileObj.addComponent(new TransformComponent(tileObj, c * TILESIZE, r * TILESIZE, TILESIZE, TILESIZE));
+                    tileObj.addComponent(new TextureComponent(tileObj,renderer, image));
 
+                    tileObj.addComponent(new AnimatedTextureComponent(tileObj, renderer, data));
+                    tileObj.addComponent(new TileScript(tileObj, t));
+
+                    rootNode.addChild(tileObj);
+                }
+            }
+        }
 
         // //background object
         // GameObject bg = new GameObject();
