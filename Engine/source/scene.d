@@ -63,7 +63,9 @@ class Level1 : Scene{
     override void setUpScene(string image, string data){
         //make our root node for scene tree
         GameObject rootNode = new GameObject();
+        GameObject tileNode = new GameObject();
         tree.setRoot(rootNode);
+        rootNode.addChild(tileNode);
         
         auto tm = ResourceManager.GetInstance().LoadTileMap("./assets/maps/map.json");
         foreach(r; 0 .. tm.height) {

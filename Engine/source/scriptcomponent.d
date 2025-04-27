@@ -294,7 +294,7 @@ class ButtonScript : ScriptComponent{
 
 
 class TileScript : ScriptComponent {
-    private string tileType;
+    public string tileType;
     this(GameObject owner, string tileType) {
         super(owner);
         this.tileType = tileType;
