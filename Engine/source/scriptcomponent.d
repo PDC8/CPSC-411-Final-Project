@@ -68,12 +68,12 @@ class PeanutButterScript : ScriptComponent{
             v_velocity += gravity;
             v_velocity = min(v_velocity, v_maxSpeed);
             
-            // Temporary ground check- TODO: change later when platorm tiling is implemented
-            if (transform.y > 100) {
-                transform.y = 100;
-                v_velocity = 0;
-                isJump = false;
-            }
+            // // Temporary ground check- TODO: change later when platorm tiling is implemented
+            // if (transform.y > 100) {
+            //     transform.y = 100;
+            //     v_velocity = 0;
+            //     isJump = false;
+            // }
 
             dx = direction * h_velocity;
             dy = v_velocity;
@@ -330,15 +330,30 @@ class CollisionManagerScript : ScriptComponent {
                 auto tileType = tile.getComponent!TileScript().tileType;
                 if(checkCollision(peanutButter, tile)){
                     if(tileType == "ground"){
-                        // peanutButter is on top of tile
-                        transform.y = tileTransform.y - transform.h;
-                        peanutButter.getComponent!PeanutButterScript().v_velocity = 0;
-                        peanutButter.getComponent!PeanutButterScript().isJump = false;
+                        if(transform.y < tileTransform.y){ //colision from above
+                            transform.y = tileTransform.y - transform.h;
+                            peanutButter.getComponent!PeanutButterScript().v_velocity = 0;
+                            peanutButter.getComponent!PeanutButterScript().isJump = false;
+                        }
+                        else if(transform.y > tileTransform.y){ //colision from below
+                            transform.y = tileTransform.y + tileTransform.h;
+                            peanutButter.getComponent!PeanutButterScript().v_velocity = 0;
+                        }
+                        else if(transform.x - 32 < tileTransform.x){ //colision from left
+                            transform.x = tileTransform.x - transform.w;
+                            transform.y -= transform.h; //prevent phasing down through tile
+                            peanutButter.getComponent!PeanutButterScript().h_velocity = 0;
+                        }
+                        else if(transform.x > tileTransform.x + 10){ //colision from right
+                            transform.x = tileTransform.x + transform.w + transform.w;
+                            transform.y -= transform.h; //prevent phasing down through tile
+                            peanutButter.getComponent!PeanutButterScript().h_velocity = 0;
+                        }
                     }
-                    else if(tileType == "obstacle"){ // obstacle tile
+                    // else if(tileType == "obstacle"){ // obstacle tile
                         
-                    }
-                    else if(tileType == "ladder"){} //ladder tile
+                    // }
+                    // else if(tileType == "ladder"){} //ladder tile
                 }
             }
         }

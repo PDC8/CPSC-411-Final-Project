@@ -63,10 +63,19 @@ class Level1 : Scene{
     override void setUpScene(string image, string data){
         //make our root node for scene tree
         GameObject rootNode = new GameObject();
-        GameObject tileNode = new GameObject();
         tree.setRoot(rootNode);
-        rootNode.addChild(tileNode);
-        
+
+        //background object
+        GameObject bg = new GameObject();
+        bg.addComponent(new TransformComponent(bg, 0, 0, 1136, 640));
+        bg.addComponent(new TextureComponent(bg, renderer, "./assets/Background.bmp"));
+        bg.addComponent(new AnimatedTextureComponent(bg, renderer, "./assets/Background.json"));
+        bg.addComponent(new BgScript(bg));
+        rootNode.addChild(bg);
+
+        //set up tiles container
+        GameObject tilesContainer = new GameObject();
+        rootNode.addChild(tilesContainer);
         auto tm = ResourceManager.GetInstance().LoadTileMap("./assets/maps/map.json");
         foreach(r; 0 .. tm.height) {
             foreach(c; 0 .. tm.width) {
@@ -80,7 +89,7 @@ class Level1 : Scene{
                     tileObj.addComponent(new AnimatedTextureComponent(tileObj, renderer, data));
                     tileObj.addComponent(new TileScript(tileObj, t));
 
-                    rootNode.addChild(tileObj);
+                    tilesContainer.addChild(tileObj);
                 }
             }
         }
@@ -106,13 +115,6 @@ class Level1 : Scene{
         // worldContainer.addComponent(new WorldContainerScript(worldContainer));
         // camera.addChild(worldContainer);
 
-        //background object
-        GameObject bg = new GameObject();
-        bg.addComponent(new TransformComponent(bg, 0, 0, 1136, 640));
-        bg.addComponent(new TextureComponent(bg, renderer, "./assets/Background.bmp"));
-        bg.addComponent(new AnimatedTextureComponent(bg, renderer, "./assets/Background.json"));
-        bg.addComponent(new BgScript(bg));
-        rootNode.addChild(bg);
 
         //set up peanut butter object
         GameObject peanutButter = new GameObject();
@@ -131,10 +133,10 @@ class Level1 : Scene{
         rootNode.addChild(jelly);
 
 
-        //collision manager
-        // GameObject collisionManager = new GameObject();
-        // collisionManager.addComponent(new CollisionManagerScript(collisionManager, peanutButter, jelly, tilesContainer));
-        // rootNode.addChild(collisionManager);
+        // collision manager
+        GameObject collisionManager = new GameObject();
+        collisionManager.addComponent(new CollisionManagerScript(collisionManager, peanutButter, jelly, tilesContainer));
+        rootNode.addChild(collisionManager);
 
         // //game manager
         // GameObject gameManager = new GameObject();
