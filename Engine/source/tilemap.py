@@ -6,7 +6,7 @@ import json
 TILESIZE   = 32
 MAP_COLS   = 50
 MAP_ROWS   = 30
-TILE_TYPES = ['ground', 'obstacle']
+TILE_TYPES = ['ground', 'obstacle', 'ladder']
 
 class TileMapEditor:
     def __init__(self, gui):
@@ -56,8 +56,10 @@ class TileMapEditor:
             draw = ImageDraw.Draw(img)
             if ttype == 'ground':
                 color = (34,139,34)    # forest green
-            else:
+            elif ttype == 'obstacle':
                 color = (139,69,19)    # brown
+            elif ttype == 'ladder': 
+                color = (0,0,0) # black
             draw.rectangle([0,0,TILESIZE,TILESIZE], fill=color, outline="black")
             self.tile_images[ttype] = ImageTk.PhotoImage(img)
 
