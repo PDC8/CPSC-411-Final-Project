@@ -205,6 +205,109 @@ class JellyScript : ScriptComponent{
     }
 }
 
+class MergedPeanutButterJellyScript : ScriptComponent{
+    int h_velocity = 0;
+    int h_acceleration = 2;
+    int h_friction = 1;
+    int h_maxSpeed = 4;
+
+    int v_velocity = 0;
+    int jumpVelocity = -15;
+    int gravity = 1;
+    int v_maxSpeed = 10;
+
+
+    bool isJump = false;
+    int direction = 0; //0: for idle, -1: for left, 1: for right
+
+    int dx;
+    int dy;
+
+    this(GameObject owner){
+		super(owner);
+    }
+    override void Input(){
+        ubyte* keystate = SDL_GetKeyboardState(null);
+
+        if(keystate[SDL_SCANCODE_A]){
+            direction = -1;
+            h_velocity += h_acceleration;
+        }
+        else if(keystate[SDL_SCANCODE_D]){
+            direction = 1;
+            h_velocity += h_acceleration;
+        }
+        if (keystate[SDL_SCANCODE_W]){
+            if(isJump){
+                return;
+            }
+            v_velocity = jumpVelocity;
+            isJump = true;
+        }	
+    }
+    override void Update(){
+        auto transform = mOwner.getComponent!TransformComponent();
+        if(transform !is null){
+
+            if (direction == 0) {
+                h_velocity -= h_friction;
+                if (h_velocity < 0) h_velocity = 0;
+            }
+            h_velocity = min(h_velocity, h_maxSpeed);
+
+            v_velocity += gravity;
+            v_velocity = min(v_velocity, v_maxSpeed);
+            
+            // // Temporary ground check- TODO: change later when platorm tiling is implemented
+            // if (transform.y > 100) {
+            //     transform.y = 100;
+            //     v_velocity = 0;
+            //     isJump = false;
+            // }
+
+            dx = direction * h_velocity;
+            dy = v_velocity;
+            transform.x += dx;
+            transform.y += dy;
+        }
+    }
+    override void Render(){
+        auto animated = mOwner.getComponent!AnimatedTextureComponent();
+        if(animated is null){
+            return;
+        }
+        else{
+            if(direction == 0){
+                if(isJump){
+                    animated.LoopAnimationSequence("pbj_idle_jump");
+                }
+                else{
+                    animated.LoopAnimationSequence("pbj_idle");
+                }
+            }
+            else if(direction == -1){
+                if(isJump){
+                    animated.LoopAnimationSequence("pbj_jump_left");
+                }
+                else{
+                    animated.LoopAnimationSequence("pbj_run_left");
+                }
+            }
+            else if(direction == 1){
+                if(isJump){
+                    animated.LoopAnimationSequence("pbj_jump_right");
+                }
+                else{
+                    animated.LoopAnimationSequence("pbj_run_right");
+                }
+            }
+        }
+        direction = 0;
+    }
+}
+
+
+
 // class CameraScript : ScriptComponent{
 //     GameObject mTarget;
 
@@ -300,12 +403,14 @@ class CollisionManagerScript : ScriptComponent {
     GameObject peanutButter;
     GameObject jelly;
     GameObject tilesContainer;
+    GameObject mergedPeanutButterJelly;
 
-    this(GameObject owner, GameObject peanutButter, GameObject jelly, GameObject tilesContainer) {
+    this(GameObject owner, GameObject peanutButter, GameObject jelly, GameObject tilesContainer, GameObject mergedPeanutButterJelly) {
         super(owner);
         this.peanutButter = peanutButter;
         this.jelly = jelly;
         this.tilesContainer = tilesContainer;
+        this.mergedPeanutButterJelly = mergedPeanutButterJelly;
     }
 
     override void Update() {
@@ -313,6 +418,7 @@ class CollisionManagerScript : ScriptComponent {
         foreach(tile; tilesContainer.children){
             checkPlayerTileCollision(peanutButter, tile);
             checkPlayerTileCollision(jelly, tile);
+            checkPlayerTileCollision(mergedPeanutButterJelly, tile);
         }
         // peanutButter-jelly Collisions
         if(checkCollision(peanutButter, jelly)){

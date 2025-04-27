@@ -137,21 +137,21 @@ class Level1 : Scene{
         mergedPeanutButterJelly.addComponent(new TransformComponent(mergedPeanutButterJelly, J_X, J_Y, 32, 32));
         mergedPeanutButterJelly.addComponent(new TextureComponent(mergedPeanutButterJelly, renderer, image));
         mergedPeanutButterJelly.addComponent(new AnimatedTextureComponent(mergedPeanutButterJelly, renderer, data));
-        mergedPeanutButterJelly.addComponent(new JellyScript(mergedPeanutButterJelly));
+        mergedPeanutButterJelly.addComponent(new MergedPeanutButterJellyScript(mergedPeanutButterJelly));
         mergedPeanutButterJelly.isActive = false; // set to invisible at the start!
         rootNode.addChild(mergedPeanutButterJelly);
 
 
         // uncomment to enable feature where peanut butter and jelly can "merge" by pressing space key
         // merge manager
-        // GameObject mergeManager = new GameObject();
-        // mergeManager.addComponent(new MergeManagerScript(mergeManager, peanutButter, jelly, mergedPeanutButterJelly));
-        // rootNode.addChild(mergeManager);
+        GameObject mergeManager = new GameObject();
+        mergeManager.addComponent(new MergeManagerScript(mergeManager, peanutButter, jelly, mergedPeanutButterJelly));
+        rootNode.addChild(mergeManager);
 
 
         // collision manager
         GameObject collisionManager = new GameObject();
-        collisionManager.addComponent(new CollisionManagerScript(collisionManager, peanutButter, jelly, tilesContainer));
+        collisionManager.addComponent(new CollisionManagerScript(collisionManager, peanutButter, jelly, tilesContainer, mergedPeanutButterJelly));
         rootNode.addChild(collisionManager);
 
         // //game manager
