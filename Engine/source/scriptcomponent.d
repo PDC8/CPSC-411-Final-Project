@@ -339,13 +339,13 @@ class CollisionManagerScript : ScriptComponent {
                             transform.y = tileTransform.y + tileTransform.h;
                             peanutButter.getComponent!PeanutButterScript().v_velocity = 0;
                         }
-                        else if(transform.x - 32 < tileTransform.x){ //colision from left
-                            transform.x = tileTransform.x - transform.w;
+                        else if (transform.x + transform.w > tileTransform.x && transform.x < tileTransform.x) { //collision from left
+                            transform.x = tileTransform.x - transform.w; // prevent overlap from the left
                             transform.y -= transform.h; //prevent phasing down through tile
                             peanutButter.getComponent!PeanutButterScript().h_velocity = 0;
                         }
                         else if(transform.x > tileTransform.x + 10){ //colision from right
-                            transform.x = tileTransform.x + transform.w + transform.w;
+                            transform.x = tileTransform.x + transform.w;
                             transform.y -= transform.h; //prevent phasing down through tile
                             peanutButter.getComponent!PeanutButterScript().h_velocity = 0;
                         }
