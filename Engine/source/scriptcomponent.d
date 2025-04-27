@@ -67,13 +67,6 @@ class PeanutButterScript : ScriptComponent{
 
             v_velocity += gravity;
             v_velocity = min(v_velocity, v_maxSpeed);
-            
-            // // Temporary ground check- TODO: change later when platorm tiling is implemented
-            // if (transform.y > 100) {
-            //     transform.y = 100;
-            //     v_velocity = 0;
-            //     isJump = false;
-            // }
 
             dx = direction * h_velocity;
             dy = v_velocity;
@@ -168,12 +161,6 @@ class JellyScript : ScriptComponent{
 
             v_velocity += gravity;
             v_velocity = min(v_velocity, v_maxSpeed);
-            
-            // Temporary ground check- TODO: change later when platorm tiling is implemented
-            if (transform.y > 100) {
-                transform.y = 100;
-                v_velocity = 0;
-            }
 
             dx = direction * h_velocity;
             dy = v_velocity;
@@ -324,38 +311,8 @@ class CollisionManagerScript : ScriptComponent {
     override void Update() {
         // peanutButter tile collisions
         foreach(tile; tilesContainer.children){
-            if(tile.isActive){
-                auto transform = peanutButter.getComponent!TransformComponent();
-                auto tileTransform = tile.getComponent!TransformComponent();
-                auto tileType = tile.getComponent!TileScript().tileType;
-                if(checkCollision(peanutButter, tile)){
-                    if(tileType == "ground"){
-                        if(transform.y < tileTransform.y){ //colision from above
-                            transform.y = tileTransform.y - transform.h;
-                            peanutButter.getComponent!PeanutButterScript().v_velocity = 0;
-                            peanutButter.getComponent!PeanutButterScript().isJump = false;
-                        }
-                        else if(transform.y > tileTransform.y){ //colision from below
-                            transform.y = tileTransform.y + tileTransform.h;
-                            peanutButter.getComponent!PeanutButterScript().v_velocity = 0;
-                        }
-                        else if (transform.x + transform.w > tileTransform.x && transform.x < tileTransform.x) { //collision from left
-                            transform.x = tileTransform.x - transform.w; // prevent overlap from the left
-                            transform.y -= transform.h; //prevent phasing down through tile
-                            peanutButter.getComponent!PeanutButterScript().h_velocity = 0;
-                        }
-                        else if(transform.x > tileTransform.x + 10){ //colision from right
-                            transform.x = tileTransform.x + transform.w;
-                            transform.y -= transform.h; //prevent phasing down through tile
-                            peanutButter.getComponent!PeanutButterScript().h_velocity = 0;
-                        }
-                    }
-                    // else if(tileType == "obstacle"){ // obstacle tile
-                        
-                    // }
-                    // else if(tileType == "ladder"){} //ladder tile
-                }
-            }
+            checkPlayerTileCollision(peanutButter, tile);
+            checkPlayerTileCollision(jelly, tile);
         }
         // peanutButter-jelly Collisions
         if(checkCollision(peanutButter, jelly)){
@@ -368,6 +325,43 @@ class CollisionManagerScript : ScriptComponent {
         auto transform2 = obj2.getComponent!TransformComponent();
 
         return SDL_HasIntersection(&transform1.mRectangle, &transform2.mRectangle) == SDL_TRUE;
+    }
+
+    void checkPlayerTileCollision(GameObject player, GameObject tile){
+        if(tile.isActive){
+            auto transform = player.getComponent!TransformComponent();
+            auto tileTransform = tile.getComponent!TransformComponent();
+            auto tileType = tile.getComponent!TileScript().tileType;
+            if(checkCollision(player, tile)){
+                if(tileType == "ground"){
+                    if(transform.y < tileTransform.y){ //colision from above
+                        transform.y = tileTransform.y - transform.h;
+                        peanutButter.getComponent!PeanutButterScript().v_velocity = 0;
+                        peanutButter.getComponent!PeanutButterScript().isJump = false;
+                    }
+                    else if(transform.y > tileTransform.y){ //colision from below
+                        transform.y = tileTransform.y + tileTransform.h;
+                        peanutButter.getComponent!PeanutButterScript().v_velocity = 0;
+                    }
+                    else if (transform.x + transform.w > tileTransform.x && transform.x < tileTransform.x) { //collision from left
+                        transform.x = tileTransform.x - transform.w; // prevent overlap from the left
+                        transform.y -= transform.h; //prevent phasing down through tile
+                        peanutButter.getComponent!PeanutButterScript().h_velocity = 0;
+                    }
+                    else if(transform.x > tileTransform.x + 10){ //colision from right
+                        transform.x = tileTransform.x + transform.w;
+                        transform.y -= transform.h; //prevent phasing down through tile
+                        peanutButter.getComponent!PeanutButterScript().h_velocity = 0;
+                    }
+                }
+                else if(tileType == "obstacle"){ //obstacle tile
+                    player.isActive = false;
+                }
+                else if(tileType == "ladder"){ //ladder tile 
+                
+                }
+            }
+        }
     }
 }
 
