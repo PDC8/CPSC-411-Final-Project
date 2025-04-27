@@ -3,15 +3,16 @@ from tkinter import filedialog as fd
 from PIL import Image, ImageTk, ImageDraw
 import json
 
-TILESIZE   = 32
-MAP_COLS   = 50
-MAP_ROWS   = 30
-TILE_TYPES = ['ground', 'obstacle', 'ladder']
+TILESIZE = 32
+TILE_TYPES = ['ground', 'ladder', 'obstacle']
 
 class TileMapEditor:
-    def __init__(self, gui):
+    def __init__(self, gui, screen_width, screen_height):
         self.gui = gui
         gui.title("2D Tile Map Editor")
+
+        self.map_cols = screen_width // TILESIZE
+        self.map_rows = screen_height // TILESIZE
 
         self.selected_tile = TILE_TYPES[0]
         self.tile_images = {}
@@ -39,8 +40,8 @@ class TileMapEditor:
 
         self.map_canvas = tk.Canvas(
             self.right_frame,
-            width=MAP_COLS*TILESIZE,
-            height=MAP_ROWS*TILESIZE,
+            width=self.map_cols*TILESIZE,
+            height=self.map_rows*TILESIZE,
             bg="white"
         )
         self.map_canvas.pack()
@@ -48,28 +49,27 @@ class TileMapEditor:
         self.map_canvas.bind("<Button-1>", self.map_click)
         self.map_canvas.bind("<B1-Motion>", self.map_drag)
 
-        self.tilemap = [[None for _ in range(MAP_COLS)] for _ in range(MAP_ROWS)]
+        self.tilemap = [[None for _ in range(self.map_cols)] for _ in range(self.map_rows)]
 
     def create_tile_images(self):
-        for ttype in TILE_TYPES:
+        for t in TILE_TYPES:
             img = Image.new("RGBA", (TILESIZE, TILESIZE), (0,0,0,0))
             draw = ImageDraw.Draw(img)
-            if ttype == 'ground':
-                color = (34,139,34)    # forest green
-            elif ttype == 'obstacle':
-                color = (139,69,19)    # brown
-            elif ttype == 'ladder': 
-                color = (0,0,0) # black
+            if t == 'ground':
+                color = (34,139,34)
+            elif t == 'ladder':
+                color = (0,0,0)
+            else:
+                color = (139,69,19)
             draw.rectangle([0,0,TILESIZE,TILESIZE], fill=color, outline="black")
-            self.tile_images[ttype] = ImageTk.PhotoImage(img)
+            self.tile_images[t] = ImageTk.PhotoImage(img)
 
     def draw_atlas(self):
         self.atlas_canvas.delete("all")
-        for idx, ttype in enumerate(TILE_TYPES):
-            img = self.tile_images[ttype]
-            self.atlas_canvas.create_image(idx*TILESIZE, 0,
-                                           image=img, anchor='nw')
-            if ttype == self.selected_tile:
+        for idx, t in enumerate(TILE_TYPES):
+            img = self.tile_images[t]
+            self.atlas_canvas.create_image(idx*TILESIZE, 0, image=img, anchor='nw')
+            if t == self.selected_tile:
                 self.atlas_canvas.create_rectangle(
                     idx*TILESIZE, 0,
                     (idx+1)*TILESIZE, TILESIZE,
@@ -83,12 +83,12 @@ class TileMapEditor:
             self.draw_atlas()
 
     def draw_grid(self):
-        for i in range(MAP_COLS+1):
+        for i in range(self.map_cols+1):
             x = i*TILESIZE
-            self.map_canvas.create_line(x, 0, x, MAP_ROWS*TILESIZE, fill="gray")
-        for j in range(MAP_ROWS+1):
+            self.map_canvas.create_line(x, 0, x, self.map_rows*TILESIZE, fill="gray")
+        for j in range(self.map_rows+1):
             y = j*TILESIZE
-            self.map_canvas.create_line(0, y, MAP_COLS*TILESIZE, y, fill="gray")
+            self.map_canvas.create_line(0, y, self.map_cols*TILESIZE, y, fill="gray")
 
     def map_click(self, event):
         self.place_tile(event)
@@ -97,11 +97,11 @@ class TileMapEditor:
         self.place_tile(event)
 
     def place_tile(self, event):
-        c, r = event.x // TILESIZE, event.y // TILESIZE
-        if 0 <= c < MAP_COLS and 0 <= r < MAP_ROWS:
+        c = event.x // TILESIZE
+        r = event.y // TILESIZE
+        if 0 <= c < self.map_cols and 0 <= r < self.map_rows:
             self.tilemap[r][c] = self.selected_tile
             tag = f"tile_{r}_{c}"
-            # remove existing at this cell, then draw
             self.map_canvas.delete(tag)
             self.map_canvas.create_image(
                 c*TILESIZE, r*TILESIZE,
@@ -110,15 +110,12 @@ class TileMapEditor:
             )
 
     def save_map(self):
-        path = fd.asksaveasfilename(
-            defaultextension=".json",
-            filetypes=[("JSON","*.json")]
-        )
+        path = fd.asksaveasfilename(defaultextension=".json", filetypes=[("JSON","*.json")])
         if not path:
             return
         data = {
-            "width": MAP_COLS,
-            "height": MAP_ROWS,
+            "width": self.map_cols,
+            "height": self.map_rows,
             "tiles": self.tilemap
         }
         with open(path, "w") as f:
@@ -126,32 +123,31 @@ class TileMapEditor:
         print("Map saved to", path)
 
     def load_map(self):
-        path = fd.askopenfilename(
-            defaultextension=".json",
-            filetypes=[("JSON","*.json")]
-        )
+        path = fd.askopenfilename(defaultextension=".json", filetypes=[("JSON","*.json")])
         if not path:
             return
         with open(path) as f:
             data = json.load(f)
         self.tilemap = data.get("tiles", self.tilemap)
         self.map_canvas.delete("tile")
-        for r in range(min(len(self.tilemap), MAP_ROWS)):
-            for c in range(min(len(self.tilemap[r]), MAP_COLS)):
-                ttype = self.tilemap[r][c]
-                if ttype:
+        for r in range(min(len(self.tilemap), self.map_rows)):
+            for c in range(min(len(self.tilemap[r]), self.map_cols)):
+                t = self.tilemap[r][c]
+                if t:
                     tag = f"tile_{r}_{c}"
                     self.map_canvas.create_image(
                         c*TILESIZE, r*TILESIZE,
-                        image=self.tile_images.get(ttype),
+                        image=self.tile_images.get(t),
                         anchor='nw', tags=("tile", tag)
                     )
-        print("Map loaded from", path)
 
 
 def main():
+    # specify your game screen resolution (pixels)
+    SCREEN_WIDTH = 640
+    SCREEN_HEIGHT = 480
     root = tk.Tk()
-    TileMapEditor(root)
+    TileMapEditor(root, SCREEN_WIDTH, SCREEN_HEIGHT)
     root.mainloop()
 
 if __name__ == "__main__":
