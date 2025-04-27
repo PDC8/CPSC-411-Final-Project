@@ -387,6 +387,80 @@ class BgScript : ScriptComponent{
     }
 }
 
+class MergeManagerScript : ScriptComponent {
+
+    GameObject peanutButter;
+    GameObject jelly;
+    GameObject mergedPeanutButterJelly;
+    bool isMerged;
+    bool isSpacePressed;
+    uint prevTransitionTime; 
+
+    this(GameObject owner, GameObject peanutButter, GameObject jelly, GameObject mergedPeanutButterJelly) {
+        super(owner);
+        this.peanutButter = peanutButter;
+        this.jelly = jelly;
+        this.mergedPeanutButterJelly = mergedPeanutButterJelly;
+        isMerged = false;
+        this.peanutButter.isActive = true;
+        this.jelly.isActive = true;
+        this.mergedPeanutButterJelly.isActive = false;
+        isSpacePressed = false;
+        prevTransitionTime = 0;
+    }
+
+    override void Input() {
+        ubyte* keystate = SDL_GetKeyboardState(null);
+        if(keystate[SDL_SCANCODE_SPACE]){
+            isSpacePressed = true;
+        } else {
+            isSpacePressed = false;
+        }
+    }
+
+    override void Update() {
+        // handles merging and unmerging logic
+
+        if (!isSpacePressed)
+            return;
+
+        auto currTime = SDL_GetTicks();
+        if (currTime - prevTransitionTime < 500)
+            return;
+
+        auto pbTransform = peanutButter.getComponent!TransformComponent();
+        auto jTransform = jelly.getComponent!TransformComponent();
+        auto mergedTransform = mergedPeanutButterJelly.getComponent!TransformComponent();
+        
+        if (!isMerged) {
+            if (abs(pbTransform.x - jTransform.x) < 30 && abs(pbTransform.y - jTransform.y) < 30) {
+                // writeln("activating super power!");
+                isMerged = true;
+                peanutButter.isActive = false;
+                jelly.isActive = false;
+                mergedPeanutButterJelly.isActive = true;
+                mergedTransform.x = pbTransform.x;
+                mergedTransform.y = pbTransform.y;
+                prevTransitionTime = currTime;
+            } else {
+                // writeln("too far apart to merge!");
+                // writefln("pb x: %d, y: %d", pbTransform.x, pbTransform.y);
+                // writefln("j x: %d, y: %d", jTransform.x, jTransform.y);
+            }
+        } else {
+            isMerged = false;
+            peanutButter.isActive = true;
+            jelly.isActive = true;
+            mergedPeanutButterJelly.isActive = false;
+            pbTransform.x = mergedTransform.x - 10; // TODO: maybe fix for edge case where you glitch out of bound
+            pbTransform.y = mergedTransform.y;
+            jTransform.x = mergedTransform.x + 10; // TODO: same as above
+            jTransform.y = mergedTransform.y;
+            prevTransitionTime = currTime;
+        }
+    }
+}
+
 // class GameManagerScript : ScriptComponent {
 //     GameObject spaceShip;
 //     LaserPool laserPool;
