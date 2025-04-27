@@ -338,7 +338,7 @@ class CollisionManagerScript : ScriptComponent {
                     else if(tileType == "obstacle"){ // obstacle tile
                         
                     }
-                    else if(tileType == "ladder") //ladder tile
+                    else if(tileType == "ladder"){} //ladder tile
                 }
             }
         }
