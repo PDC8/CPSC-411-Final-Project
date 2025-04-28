@@ -15,7 +15,7 @@ class ScriptComponent : IComponent{
     }
 }
 
-class PeanutButterScript : ScriptComponent{
+class MovementScript : ScriptComponent{
     int h_velocity = 0;
     int h_acceleration = 1;
     int h_friction = 1;
@@ -24,8 +24,7 @@ class PeanutButterScript : ScriptComponent{
     int v_velocity = 0;
     int jumpVelocity = -15;
     int gravity = 1;
-    int v_maxSpeed = 10;
-
+    int v_maxSpeed = 5;
 
     bool isJump = false;
     int direction = 0; //0: for idle, -1: for left, 1: for right
@@ -33,6 +32,14 @@ class PeanutButterScript : ScriptComponent{
     int dx;
     int dy;
 
+    this(GameObject owner){
+        super(owner);
+    }
+}
+
+
+
+class PeanutButterScript : MovementScript{
     this(GameObject owner){
 		super(owner);
     }
@@ -110,26 +117,7 @@ class PeanutButterScript : ScriptComponent{
 }
 
 
-
-
-class JellyScript : ScriptComponent{
-    int h_velocity = 0;
-    int h_acceleration = 1;
-    int h_friction = 1;
-    int h_maxSpeed = 2;
-
-    int v_velocity = 0;
-    int jumpVelocity = -5;
-    int gravity = 1;
-    int v_maxSpeed = 5;
-
-
-    bool isJump = false;
-    int direction = 0; //0: for idle, -1: for left, 1: for right
-
-    int dx;
-    int dy;
-
+class JellyScript : MovementScript{
     this(GameObject owner){
 		super(owner);
     }
@@ -205,24 +193,7 @@ class JellyScript : ScriptComponent{
     }
 }
 
-class MergedPeanutButterJellyScript : ScriptComponent{
-    int h_velocity = 0;
-    int h_acceleration = 2;
-    int h_friction = 1;
-    int h_maxSpeed = 4;
-
-    int v_velocity = 0;
-    int jumpVelocity = -15;
-    int gravity = 1;
-    int v_maxSpeed = 10;
-
-
-    bool isJump = false;
-    int direction = 0; //0: for idle, -1: for left, 1: for right
-
-    int dx;
-    int dy;
-
+class MergedPeanutButterJellyScript : MovementScript{
     this(GameObject owner){
 		super(owner);
     }
@@ -237,7 +208,7 @@ class MergedPeanutButterJellyScript : ScriptComponent{
             direction = 1;
             h_velocity += h_acceleration;
         }
-        if (keystate[SDL_SCANCODE_W]){
+        if (keystate[SDL_SCANCODE_UP]){
             if(isJump){
                 return;
             }
@@ -257,13 +228,6 @@ class MergedPeanutButterJellyScript : ScriptComponent{
 
             v_velocity += gravity;
             v_velocity = min(v_velocity, v_maxSpeed);
-            
-            // // Temporary ground check- TODO: change later when platorm tiling is implemented
-            // if (transform.y > 100) {
-            //     transform.y = 100;
-            //     v_velocity = 0;
-            //     isJump = false;
-            // }
 
             dx = direction * h_velocity;
             dy = v_velocity;
@@ -305,38 +269,6 @@ class MergedPeanutButterJellyScript : ScriptComponent{
         direction = 0;
     }
 }
-
-
-
-// class CameraScript : ScriptComponent{
-//     GameObject mTarget;
-
-//     this(GameObject owner, GameObject target){
-//         super(owner);
-//         mTarget = target;
-//     }
-
-//     override void Update() {
-//         auto targetScript = mTarget.getComponent!SpaceShipScript();
-//         auto cameraTransform = mOwner.getComponent!TransformComponent();
-
-//         auto dx = -targetScript.dx;
-//         auto dy = -targetScript.dy;
-//         cameraTransform.updatePosition(dx, dy);
-//     }
-// }
-
-// class WorldContainerScript : ScriptComponent {
-//     this(GameObject owner){
-//         super(owner);
-//     }
-//     override void Update() {
-//         // Sync with camera's inverse movement
-//         auto cameraTransform = mOwner.parent.getComponent!TransformComponent();
-//         mOwner.getComponent!TransformComponent().x = -cameraTransform.x;
-//         mOwner.getComponent!TransformComponent().y = -cameraTransform.y;
-//     }
-// }
 
 class ButtonScript : ScriptComponent{
     private bool hover;
@@ -382,7 +314,6 @@ class ButtonScript : ScriptComponent{
     }
 }
 
-
 class TileScript : ScriptComponent {
     public string tileType;
     this(GameObject owner, string tileType) {
@@ -404,25 +335,67 @@ class CollisionManagerScript : ScriptComponent {
     GameObject jelly;
     GameObject tilesContainer;
     GameObject mergedPeanutButterJelly;
+    bool isMerged = false;
+    bool isSpacePressed = false;
+    uint prevTransitionTime = 0;
 
-    this(GameObject owner, GameObject peanutButter, GameObject jelly, GameObject tilesContainer, GameObject mergedPeanutButterJelly) {
+    this(GameObject owner, GameObject peanutButter, GameObject jelly, GameObject mergedPeanutButterJelly, GameObject tilesContainer) {
         super(owner);
         this.peanutButter = peanutButter;
         this.jelly = jelly;
-        this.tilesContainer = tilesContainer;
         this.mergedPeanutButterJelly = mergedPeanutButterJelly;
+        this.tilesContainer = tilesContainer;
+    }
+
+    override void Input() {
+        ubyte* keystate = SDL_GetKeyboardState(null);
+        if(keystate[SDL_SCANCODE_SPACE]){
+            isSpacePressed = true;
+        } else {
+            isSpacePressed = false;
+        }
     }
 
     override void Update() {
-        // peanutButter tile collisions
         foreach(tile; tilesContainer.children){
             checkPlayerTileCollision(peanutButter, tile);
             checkPlayerTileCollision(jelly, tile);
             checkPlayerTileCollision(mergedPeanutButterJelly, tile);
         }
+
         // peanutButter-jelly Collisions
         if(checkCollision(peanutButter, jelly)){
-            //do something
+            if(!isSpacePressed)
+                return;
+
+            auto currTime = SDL_GetTicks();
+            if (currTime - prevTransitionTime < 500)
+                return;
+
+            auto pbTransform = peanutButter.getComponent!TransformComponent();
+            auto jTransform = jelly.getComponent!TransformComponent();
+            auto mergedTransform = mergedPeanutButterJelly.getComponent!TransformComponent();
+
+            if (!isMerged) {
+                isMerged = true;
+                peanutButter.isActive = false;
+                jelly.isActive = false;
+                mergedPeanutButterJelly.isActive = true;
+                mergedTransform.x = pbTransform.x;
+                mergedTransform.y = pbTransform.y;
+                prevTransitionTime = currTime;
+
+            } else {
+                isMerged = false;
+                peanutButter.isActive = true;
+                jelly.isActive = true;
+                mergedPeanutButterJelly.isActive = false;
+                pbTransform.x = mergedTransform.x - 10; // TODO: maybe fix for edge case where you glitch out of bound
+                pbTransform.y = mergedTransform.y;
+                jTransform.x = mergedTransform.x + 10; // TODO: same as above
+                jTransform.y = mergedTransform.y;
+                prevTransitionTime = currTime;
+            }
         }
     }
 
@@ -438,26 +411,39 @@ class CollisionManagerScript : ScriptComponent {
             auto transform = player.getComponent!TransformComponent();
             auto tileTransform = tile.getComponent!TransformComponent();
             auto tileType = tile.getComponent!TileScript().tileType;
+            MovementScript playerScript;
+            if(player.scriptType == "PeanutButterScript"){
+                playerScript = player.getComponent!PeanutButterScript();
+            }
+            else if(player.scriptType == "JellyScript"){
+                playerScript = player.getComponent!JellyScript();
+            }
+            else if(player.scriptType == "MergedPeanutButterJellyScript"){
+                playerScript = player.getComponent!MergedPeanutButterJellyScript();
+            }
+
             if(checkCollision(player, tile)){
                 if(tileType == "ground"){
                     if(transform.y < tileTransform.y){ //colision from above
                         transform.y = tileTransform.y - transform.h;
-                        peanutButter.getComponent!PeanutButterScript().v_velocity = 0;
-                        peanutButter.getComponent!PeanutButterScript().isJump = false;
+                        playerScript.v_velocity = 0;
+                        playerScript.isJump = false;
                     }
                     else if(transform.y > tileTransform.y){ //colision from below
                         transform.y = tileTransform.y + tileTransform.h;
-                        peanutButter.getComponent!PeanutButterScript().v_velocity = 0;
+                        playerScript.v_velocity = 0;
                     }
                     else if (transform.x + transform.w > tileTransform.x && transform.x < tileTransform.x) { //collision from left
                         transform.x = tileTransform.x - transform.w; // prevent overlap from the left
                         transform.y -= transform.h; //prevent phasing down through tile
-                        peanutButter.getComponent!PeanutButterScript().h_velocity = 0;
+                        playerScript.h_velocity = 0;
+                        playerScript.isJump = false; //allow for double jump off side wall
                     }
                     else if(transform.x > tileTransform.x + 10){ //colision from right
                         transform.x = tileTransform.x + transform.w;
                         transform.y -= transform.h; //prevent phasing down through tile
-                        peanutButter.getComponent!PeanutButterScript().h_velocity = 0;
+                        playerScript.h_velocity = 0;
+                        playerScript.isJump = false; //allow for double jump off side wall
                     }
                 }
                 else if(tileType == "obstacle"){ //obstacle tile
@@ -487,79 +473,8 @@ class BgScript : ScriptComponent{
     }
 }
 
-class MergeManagerScript : ScriptComponent {
 
-    GameObject peanutButter;
-    GameObject jelly;
-    GameObject mergedPeanutButterJelly;
-    bool isMerged;
-    bool isSpacePressed;
-    uint prevTransitionTime; 
 
-    this(GameObject owner, GameObject peanutButter, GameObject jelly, GameObject mergedPeanutButterJelly) {
-        super(owner);
-        this.peanutButter = peanutButter;
-        this.jelly = jelly;
-        this.mergedPeanutButterJelly = mergedPeanutButterJelly;
-        isMerged = false;
-        this.peanutButter.isActive = true;
-        this.jelly.isActive = true;
-        this.mergedPeanutButterJelly.isActive = false;
-        isSpacePressed = false;
-        prevTransitionTime = 0;
-    }
-
-    override void Input() {
-        ubyte* keystate = SDL_GetKeyboardState(null);
-        if(keystate[SDL_SCANCODE_SPACE]){
-            isSpacePressed = true;
-        } else {
-            isSpacePressed = false;
-        }
-    }
-
-    override void Update() {
-        // handles merging and unmerging logic
-
-        if (!isSpacePressed)
-            return;
-
-        auto currTime = SDL_GetTicks();
-        if (currTime - prevTransitionTime < 500)
-            return;
-
-        auto pbTransform = peanutButter.getComponent!TransformComponent();
-        auto jTransform = jelly.getComponent!TransformComponent();
-        auto mergedTransform = mergedPeanutButterJelly.getComponent!TransformComponent();
-        
-        if (!isMerged) {
-            if (abs(pbTransform.x - jTransform.x) < 30 && abs(pbTransform.y - jTransform.y) < 30) {
-                // writeln("activating super power!");
-                isMerged = true;
-                peanutButter.isActive = false;
-                jelly.isActive = false;
-                mergedPeanutButterJelly.isActive = true;
-                mergedTransform.x = pbTransform.x;
-                mergedTransform.y = pbTransform.y;
-                prevTransitionTime = currTime;
-            } else {
-                // writeln("too far apart to merge!");
-                // writefln("pb x: %d, y: %d", pbTransform.x, pbTransform.y);
-                // writefln("j x: %d, y: %d", jTransform.x, jTransform.y);
-            }
-        } else {
-            isMerged = false;
-            peanutButter.isActive = true;
-            jelly.isActive = true;
-            mergedPeanutButterJelly.isActive = false;
-            pbTransform.x = mergedTransform.x - 10; // TODO: maybe fix for edge case where you glitch out of bound
-            pbTransform.y = mergedTransform.y;
-            jTransform.x = mergedTransform.x + 10; // TODO: same as above
-            jTransform.y = mergedTransform.y;
-            prevTransitionTime = currTime;
-        }
-    }
-}
 
 // class GameManagerScript : ScriptComponent {
 //     GameObject spaceShip;

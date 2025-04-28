@@ -12,6 +12,7 @@ class GameObject{
 	// Components 
 	IComponent[string] mComponents;
 	bool isActive = true;
+	string scriptType = ""; // Used for movement mixins 
 
 	// Destructor
 	~this(){
