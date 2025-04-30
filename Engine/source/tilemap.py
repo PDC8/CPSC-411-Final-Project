@@ -4,7 +4,7 @@ from PIL import Image, ImageTk, ImageDraw
 import json
 
 TILESIZE = 32
-TILE_TYPES = ['ground', 'jelly_ground', 'pb_ground', 'obstacle']
+TILE_TYPES = ['ground', 'jelly_ground', 'pb_ground', 'obstacle', 'eraser']
 
 class TileMapEditor:
     def __init__(self, gui, screen_width, screen_height):
@@ -56,29 +56,17 @@ class TileMapEditor:
         self.tile_images = {}
         
         for index, t in enumerate(TILE_TYPES):
-            x0 = index * TILESIZE
-            y0 = 0
-            x1 = x0 + TILESIZE
-            y1 = y0 + TILESIZE
+            if(t == 'eraser'):
+                img = Image.new("RGBA", (TILESIZE, TILESIZE), (255, 255, 255, 255))
+                self.tile_images[t] = ImageTk.PhotoImage(img)
+            else:
+                x0 = index * TILESIZE
+                y0 = 0
+                x1 = x0 + TILESIZE
+                y1 = y0 + TILESIZE
 
-            tile_img = spritesheet.crop((x0, y0, x1, y1))
-            self.tile_images[t] = ImageTk.PhotoImage(tile_img)
-
-
-
-
-
-        # for t in TILE_TYPES:
-        #     img = Image.new("RGBA", (TILESIZE, TILESIZE), (0,0,0,0))
-        #     draw = ImageDraw.Draw(img)
-        #     if t == 'ground':
-        #         color = (34,139,34)
-        #     elif t == 'ladder':
-        #         color = (0,0,0)
-        #     else:
-        #         color = (139,69,19)
-        #     draw.rectangle([0,0,TILESIZE,TILESIZE], fill=color, outline="black")
-        #     self.tile_images[t] = ImageTk.PhotoImage(img)
+                tile_img = spritesheet.crop((x0, y0, x1, y1))
+                self.tile_images[t] = ImageTk.PhotoImage(tile_img)
 
     def draw_atlas(self):
         self.atlas_canvas.delete("all")
@@ -118,12 +106,16 @@ class TileMapEditor:
         if 0 <= c < self.map_cols and 0 <= r < self.map_rows:
             self.tilemap[r][c] = self.selected_tile
             tag = f"tile_{r}_{c}"
-            self.map_canvas.delete(tag)
-            self.map_canvas.create_image(
-                c*TILESIZE, r*TILESIZE,
-                image=self.tile_images[self.selected_tile],
-                anchor='nw', tags=("tile", tag)
-            )
+            if self.selected_tile == 'eraser':
+                self.tilemap[r][c] = None
+                self.map_canvas.delete(tag)
+            else:
+                self.map_canvas.delete(tag)
+                self.map_canvas.create_image(
+                    c*TILESIZE, r*TILESIZE,
+                    image=self.tile_images[self.selected_tile],
+                    anchor='nw', tags=("tile", tag)
+                )
 
     def save_map(self):
         path = fd.asksaveasfilename(defaultextension=".json", filetypes=[("JSON","*.json")])
