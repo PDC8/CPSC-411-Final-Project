@@ -4,7 +4,7 @@ from PIL import Image, ImageTk
 import json
 
 TILESIZE = 32
-TILE_TYPES = ['pb', 'jelly', 'ground', 'jelly_ground', 'pb_ground', 'obstacle', 'eraser']
+TILE_TYPES = ['pb', 'jelly', 'ground', 'jelly_ground', 'pb_ground', 'obstacle', 'star', 'eraser']
 
 class TileMapEditor:
     def __init__(self, gui, screen_width, screen_height):
@@ -177,7 +177,21 @@ class TileMapEditor:
                         image=self.tile_images.get(t),
                         anchor='nw', tags=("tile", tag)
                     )
-
+                #redraw
+        r, c = self.pb_spawn
+        tag = f"tile_{r}_{c}"
+        self.map_canvas.create_image(
+            c * TILESIZE, r * TILESIZE,
+            image=self.tile_images["pb"],
+            anchor='nw', tags=("tile", tag)
+        )
+        r, c = self.j_spawn
+        tag = f"tile_{r}_{c}"
+        self.map_canvas.create_image(
+            c * TILESIZE, r * TILESIZE,
+            image=self.tile_images["jelly"],
+            anchor='nw', tags=("tile", tag)
+        )
 
 def main():
     # specify your game screen resolution (pixels)

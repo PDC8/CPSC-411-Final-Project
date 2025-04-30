@@ -21,6 +21,7 @@
             "p_jump_left": [44,45,46,47],
             "play_button_1": [48],
             "play_button_2": [49],
+            "star": [50],
             "ground":   [52],
             "jelly_ground":   [53],
             "pb_ground": [54],   
