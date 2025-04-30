@@ -8,7 +8,8 @@ abstract class Scene{
     SceneTree tree;
     SDL_Renderer* renderer;
     SceneManager sceneManager;
-    bool gameOver = false;
+    static bool gameOver = false;
+    static bool win = false;
     this(SDL_Renderer* renderer, SceneManager sceneManager){
         this.renderer = renderer;
         this.sceneManager = sceneManager;
@@ -49,12 +50,59 @@ class MainMenu : Scene{
     }
 }
 
+class Win : Scene{
+    immutable int size = 200;
+    this(SDL_Renderer* renderer, SceneManager sceneManager, string image, string data){
+        super(renderer, sceneManager);
+        setUpScene(image, data);
+    }
+
+    override void setUpScene(string image, string data){
+
+        //make our root node for scene tree
+        GameObject rootNode = new GameObject();
+        tree.setRoot(rootNode);
+
+        //background object
+        GameObject bg = new GameObject();
+        bg.addComponent(new TransformComponent(bg, 0, 0, 1136, 640));
+        bg.addComponent(new TextureComponent(bg, renderer, "./assets/Background.bmp"));
+        bg.addComponent(new AnimatedTextureComponent(bg, renderer, "./assets/Background.json"));
+        bg.addComponent(new BgScript(bg));
+        rootNode.addChild(bg);
+    }
+}
+
+class GameOver : Scene{
+    immutable int size = 200;
+    this(SDL_Renderer* renderer, SceneManager sceneManager, string image, string data){
+        super(renderer, sceneManager);
+        setUpScene(image, data);
+    }
+
+    override void setUpScene(string image, string data){
+
+        //make our root node for scene tree
+        GameObject rootNode = new GameObject();
+        tree.setRoot(rootNode);
+
+        //background object
+        GameObject bg = new GameObject();
+        bg.addComponent(new TransformComponent(bg, 0, 0, 1136, 640));
+        bg.addComponent(new TextureComponent(bg, renderer, "./assets/Background.bmp"));
+        bg.addComponent(new AnimatedTextureComponent(bg, renderer, "./assets/Background.json"));
+        bg.addComponent(new BgScript(bg));
+        rootNode.addChild(bg);
+    }
+}
+
 
 class Level1 : Scene{
     int PB_X = 50;
     int PB_Y = 500;
     int J_X = 100;
     int J_Y = 500;
+    int starCount = 0;
     this(SDL_Renderer* renderer, SceneManager sceneManager, string image, string data){
         super(renderer, sceneManager);
         setUpScene(image, data);
@@ -91,30 +139,11 @@ class Level1 : Scene{
 
                     tilesContainer.addChild(tileObj);
                 }
+                if(t == "star") {
+                    starCount++; 
+                }
             }
         }
-
-        // //background object
-        // GameObject bg = new GameObject();
-        // bg.addComponent(new TransformComponent(bg, 0, 0, 640, 640));
-        // bg.addComponent(new TextureComponent(bg, renderer, "./assets/Background.bmp"));
-        // bg.addComponent(new AnimatedTextureComponent(bg, renderer, "./assets/Background.json"));
-        // bg.addComponent(new BgScript(bg));
-        // rootNode.addChild(bg);
-
-
-        // //camera object
-        // GameObject camera = new GameObject();
-        // camera.addComponent(new TransformComponent(camera, 0, 0, 0, 0));
-        // camera.addComponent(new CameraScript(camera, spaceShip));
-        // rootNode.addChild(camera);
-
-        // //worldContainer
-        // GameObject worldContainer = new GameObject();
-        // worldContainer.addComponent(new TransformComponent(worldContainer, 0, 0, 0, 0)); //allow transform inheritance
-        // worldContainer.addComponent(new WorldContainerScript(worldContainer));
-        // camera.addChild(worldContainer);
-
 
         //set up peanut butter object
         GameObject peanutButter = new GameObject();
@@ -157,7 +186,7 @@ class Level1 : Scene{
 
         // collision manager
         GameObject collisionManager = new GameObject();
-        collisionManager.addComponent(new CollisionManagerScript(collisionManager, peanutButter, jelly, mergedPeanutButterJelly, tilesContainer));
+        collisionManager.addComponent(new CollisionManagerScript(collisionManager, peanutButter, jelly, mergedPeanutButterJelly, tilesContainer, this, starCount));
         rootNode.addChild(collisionManager);
 
         // //game manager

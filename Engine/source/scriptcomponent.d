@@ -342,13 +342,18 @@ class CollisionManagerScript : ScriptComponent {
     bool isMerged = false;
     bool isSpacePressed = false;
     uint prevTransitionTime = 0;
+    Level1 level1Scene;
+    int starCount; 
+    int playerCount = 2;
 
-    this(GameObject owner, GameObject peanutButter, GameObject jelly, GameObject mergedPeanutButterJelly, GameObject tilesContainer) {
+    this(GameObject owner, GameObject peanutButter, GameObject jelly, GameObject mergedPeanutButterJelly, GameObject tilesContainer, Level1 level1Scene, int starCount) {
         super(owner);
         this.peanutButter = peanutButter;
         this.jelly = jelly;
         this.mergedPeanutButterJelly = mergedPeanutButterJelly;
         this.tilesContainer = tilesContainer;
+        this.level1Scene = level1Scene;
+        this.starCount = starCount; 
     }
 
     override void Input() {
@@ -444,7 +449,22 @@ class CollisionManagerScript : ScriptComponent {
                     }
                 }
                 else if(tileType == "obstacle"){ //obstacle tile
+                    if(player.isActive) {
+                        playerCount -= 1;
+                        if(playerCount == 0) {
+                            SceneManager.currentScene.gameOver = true;
+                        }
+                    }
                     player.isActive = false;
+                } else if(tileType == "star") { //star tile
+                    if(tile.isActive) {
+                        starCount -= 1; 
+                        if(starCount == 0) {
+                            SceneManager.currentScene.win = true;
+                            SceneManager.currentScene.gameOver = true;
+                        }
+                    }
+                    tile.isActive = false; 
                 }
             }
         }

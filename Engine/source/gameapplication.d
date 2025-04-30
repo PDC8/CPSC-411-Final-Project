@@ -5,7 +5,9 @@ import sdl_abstraction, gameapplication, gameobject, component, scriptcomponent,
 struct GameApplication{
     SDL_Window* mWindow = null;
     SDL_Renderer* mRenderer = null;
+    bool mSceneRunning = true; 
     bool mGameIsRunning = true;
+    bool mWin = false;
 
     SceneManager sceneManager;
     
@@ -60,7 +62,8 @@ struct GameApplication{
 
     void isGameOver(){
         if(sceneManager.currentScene.gameOver){
-            mGameIsRunning = false;
+            mSceneRunning = false;
+            mWin = sceneManager.currentScene.win;
         }
     }
 
@@ -72,6 +75,14 @@ struct GameApplication{
         Update();
         Render();
         isGameOver();
+
+        if(!mSceneRunning) {
+            if(mWin) {
+                sceneManager.switchScene("Win");
+            } else {
+                sceneManager.switchScene("Game Over");
+            }
+        }
 
         auto timePassed = SDL_GetTicks() - start;
         if(timePassed < 16){
