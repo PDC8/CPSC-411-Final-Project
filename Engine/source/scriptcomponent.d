@@ -490,39 +490,3 @@ class BgScript : ScriptComponent{
         }
     }
 }
-
-
-
-
-// class GameManagerScript : ScriptComponent {
-//     GameObject spaceShip;
-//     LaserPool laserPool;
-//     GameObject asteroidContainer;
-//     Scene scene;
-
-//     this(GameObject owner, GameObject spaceShip, LaserPool laserPool, GameObject asteroidContainer, Scene scene) {
-//         super(owner);
-//         this.spaceShip = spaceShip;
-//         this.laserPool = laserPool;
-//         this.asteroidContainer = asteroidContainer;
-//         this.scene = scene;
-//     }
-
-//     override void Update() {
-//         //if spaceship is inactive
-//         if(!spaceShip.isActive){
-//             scene.gameOver = true;
-//             writeln("Spaceship destroyed!");
-//         }
-//         int count = 0;
-//         foreach(asteroid; asteroidContainer.children){
-//             if(!asteroid.isActive){
-//                 count += 1;
-//             }
-//         }
-//         if(count == asteroidContainer.children.length){
-//             scene.gameOver = true;
-//             writeln("All asteroids destroyed!");
-//         }
-//     }
-// }
