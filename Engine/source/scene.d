@@ -52,9 +52,9 @@ class MainMenu : Scene{
 
 class Level1 : Scene{
     int PB_X = 0;
-    int PB_Y = 100;
-    int J_X = 100;
-    int J_Y = 100;
+    int PB_Y = 0;
+    int J_X = 0;
+    int J_Y = 0;
     this(SDL_Renderer* renderer, SceneManager sceneManager, string image, string data){
         super(renderer, sceneManager);
         setUpScene(image, data);
@@ -72,11 +72,17 @@ class Level1 : Scene{
         bg.addComponent(new AnimatedTextureComponent(bg, renderer, "./assets/Background.json"));
         bg.addComponent(new BgScript(bg));
         rootNode.addChild(bg);
+        
+        writeln("HGELP");
 
         //set up tiles container
         GameObject tilesContainer = new GameObject();
         rootNode.addChild(tilesContainer);
         auto tm = ResourceManager.GetInstance().LoadTileMap("./assets/maps/map.json");
+        PB_X = tm.pb_spawn[1] * TILESIZE;
+        PB_Y = tm.pb_spawn[0] * TILESIZE;
+        J_X = tm.j_spawn[1] * TILESIZE;
+        J_Y = tm.j_spawn[0] * TILESIZE;
         foreach(r; 0 .. tm.height) {
             foreach(c; 0 .. tm.width) {
                 auto t = tm.tiles[r][c];
@@ -94,6 +100,7 @@ class Level1 : Scene{
             }
         }
 
+        
         // //background object
         // GameObject bg = new GameObject();
         // bg.addComponent(new TransformComponent(bg, 0, 0, 640, 640));
@@ -125,7 +132,7 @@ class Level1 : Scene{
         peanutButter.scriptType = "PeanutButterScript"; // set script type for peanut butter
         peanutButter.id = 0; // set id for peanut butter
         rootNode.addChild(peanutButter);
-
+        
         //set up jelly object
         GameObject jelly = new GameObject();
         jelly.addComponent(new TransformComponent(jelly, J_X, J_Y, 32, 32));

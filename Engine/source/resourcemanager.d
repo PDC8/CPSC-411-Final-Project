@@ -12,6 +12,8 @@ class ResourceManager{
     struct TileMap {
         int width;
         int height;
+        int[2] pb_spawn;
+        int[2] j_spawn;
         string[][] tiles;
     }
 
@@ -30,6 +32,12 @@ class ResourceManager{
         TileMap mapData;
         mapData.width  = j["width"].integer.to!int;
         mapData.height = j["height"].integer.to!int;
+
+        auto pb = j["pb_spawn"].array;
+        mapData.pb_spawn = [pb[0].integer.to!int, pb[1].integer.to!int];
+
+        auto js = j["j_spawn"].array;
+        mapData.j_spawn = [js[0].integer.to!int, js[1].integer.to!int];
 
         auto rows = j["tiles"].array;
         mapData.tiles = new string[][](mapData.height);

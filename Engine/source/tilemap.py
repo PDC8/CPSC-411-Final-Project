@@ -1,10 +1,10 @@
 import tkinter as tk
-from tkinter import filedialog as fd
-from PIL import Image, ImageTk, ImageDraw
+from tkinter import messagebox, filedialog as fd
+from PIL import Image, ImageTk
 import json
 
 TILESIZE = 32
-TILE_TYPES = ['ground', 'jelly_ground', 'pb_ground', 'obstacle', 'eraser']
+TILE_TYPES = ['pb', 'jelly', 'ground', 'jelly_ground', 'pb_ground', 'obstacle', 'eraser']
 
 class TileMapEditor:
     def __init__(self, gui, screen_width, screen_height):
@@ -51,22 +51,21 @@ class TileMapEditor:
 
         self.tilemap = [[None for _ in range(self.map_cols)] for _ in range(self.map_rows)]
 
+        self.j_spawn = None
+        self.pb_spawn = None
+
     def create_tile_images(self):
         spritesheet = Image.open("../assets/Tiles.png").convert("RGBA")  # Your full tile image
         self.tile_images = {}
         
         for index, t in enumerate(TILE_TYPES):
-            if(t == 'eraser'):
-                img = Image.new("RGBA", (TILESIZE, TILESIZE), (255, 255, 255, 255))
-                self.tile_images[t] = ImageTk.PhotoImage(img)
-            else:
-                x0 = index * TILESIZE
-                y0 = 0
-                x1 = x0 + TILESIZE
-                y1 = y0 + TILESIZE
+            x0 = index * TILESIZE
+            y0 = 0
+            x1 = x0 + TILESIZE
+            y1 = y0 + TILESIZE
 
-                tile_img = spritesheet.crop((x0, y0, x1, y1))
-                self.tile_images[t] = ImageTk.PhotoImage(tile_img)
+            tile_img = spritesheet.crop((x0, y0, x1, y1))
+            self.tile_images[t] = ImageTk.PhotoImage(tile_img)
 
     def draw_atlas(self):
         self.atlas_canvas.delete("all")
@@ -106,24 +105,52 @@ class TileMapEditor:
         if 0 <= c < self.map_cols and 0 <= r < self.map_rows:
             self.tilemap[r][c] = self.selected_tile
             tag = f"tile_{r}_{c}"
+            if self.selected_tile == 'pb': # Check for pb spawn
+                if self.pb_spawn:
+                    prev_r, prev_c = self.pb_spawn
+                    self.map_canvas.delete(f"tile_{prev_r}_{prev_c}")
+                self.pb_spawn = [r, c]
+                self.tilemap[prev_r][prev_c] = None
+
+            if self.selected_tile == 'jelly': # Check for jelly spawn
+                if self.j_spawn:
+                    prev_r, prev_c = self.j_spawn
+                    self.map_canvas.delete(f"tile_{prev_r}_{prev_c}")
+                self.j_spawn = [r, c]
+                self.tilemap[prev_r][prev_c] = None
+             # Draws the tile based on image 
+            self.map_canvas.delete(tag)
+            self.map_canvas.create_image(
+                c*TILESIZE, r*TILESIZE,
+                image=self.tile_images[self.selected_tile],
+                anchor='nw', tags=("tile", tag)
+            )
+
             if self.selected_tile == 'eraser':
                 self.tilemap[r][c] = None
-                self.map_canvas.delete(tag)
-            else:
-                self.map_canvas.delete(tag)
-                self.map_canvas.create_image(
-                    c*TILESIZE, r*TILESIZE,
-                    image=self.tile_images[self.selected_tile],
-                    anchor='nw', tags=("tile", tag)
+                self.map_canvas.create_rectangle(
+                    c * TILESIZE, r * TILESIZE,
+                    (c + 1) * TILESIZE, (r + 1) * TILESIZE,
+                    fill='white', outline='gray', tags=("tile", tag)
                 )
+                # Check if spawns have been erased
+                if self.pb_spawn == [r, c]:
+                    self.pb_spawn = None
+                if self.j_spawn == [r, c]:
+                    self.j_spawn = None
 
     def save_map(self):
+        if not self.pb_spawn or not self.j_spawn:
+            messagebox.showerror("Error", "Both PB and Jelly spawn points must be set before saving.")
+            return
         path = fd.asksaveasfilename(defaultextension=".json", filetypes=[("JSON","*.json")])
         if not path:
             return
         data = {
             "width": self.map_cols,
             "height": self.map_rows,
+            "pb_spawn": self.pb_spawn,
+            "j_spawn": self.j_spawn,
             "tiles": self.tilemap
         }
         with open(path, "w") as f:
@@ -136,6 +163,8 @@ class TileMapEditor:
             return
         with open(path) as f:
             data = json.load(f)
+        self.pb_spawn = data.get("pb_spawn")
+        self.j_spawn = data.get("j_spawn")
         self.tilemap = data.get("tiles", self.tilemap)
         self.map_canvas.delete("tile")
         for r in range(min(len(self.tilemap), self.map_rows)):
