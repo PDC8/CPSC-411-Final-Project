@@ -22,7 +22,7 @@ class MovementScript : ScriptComponent{
     int h_maxSpeed = 2;
 
     int v_velocity = 0;
-    int jumpVelocity = -15;
+    int jumpVelocity = -12;
     int gravity = 1;
     int v_maxSpeed = 5;
 
@@ -42,6 +42,7 @@ class MovementScript : ScriptComponent{
 class PeanutButterScript : MovementScript{
     this(GameObject owner){
 		super(owner);
+        this.jumpVelocity = -12;
     }
     override void Input(){
         ubyte* keystate = SDL_GetKeyboardState(null);
@@ -120,6 +121,7 @@ class PeanutButterScript : MovementScript{
 class JellyScript : MovementScript{
     this(GameObject owner){
 		super(owner);
+        this.jumpVelocity = -12;
     }
     override void Input(){
         ubyte* keystate = SDL_GetKeyboardState(null);
@@ -197,6 +199,7 @@ class JellyScript : MovementScript{
 class MergedPeanutButterJellyScript : MovementScript{
     this(GameObject owner){
 		super(owner);
+        this.jumpVelocity = -15;
     }
     override void Input(){
         ubyte* keystate = SDL_GetKeyboardState(null);

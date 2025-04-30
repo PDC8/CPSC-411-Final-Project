@@ -18,8 +18,8 @@ abstract class Scene{
 
 class MainMenu : Scene{
     immutable int size = 200;
-    int buttonX = 320 - (size / 2);
-    int buttonY = 240 - (size / 2);
+    int buttonX = 400 - (size / 2);
+    int buttonY = 320 - (size / 2);
     this(SDL_Renderer* renderer, SceneManager sceneManager, string image, string data){
         super(renderer, sceneManager);
         setUpScene(image, data);
@@ -51,10 +51,10 @@ class MainMenu : Scene{
 
 
 class Level1 : Scene{
-    int PB_X = 0;
-    int PB_Y = 100;
+    int PB_X = 50;
+    int PB_Y = 500;
     int J_X = 100;
-    int J_Y = 100;
+    int J_Y = 500;
     this(SDL_Renderer* renderer, SceneManager sceneManager, string image, string data){
         super(renderer, sceneManager);
         setUpScene(image, data);
@@ -76,7 +76,7 @@ class Level1 : Scene{
         //set up tiles container
         GameObject tilesContainer = new GameObject();
         rootNode.addChild(tilesContainer);
-        auto tm = ResourceManager.GetInstance().LoadTileMap("./assets/maps/map.json");
+        auto tm = ResourceManager.GetInstance().LoadTileMap("./assets/maps/larger_map.json");
         foreach(r; 0 .. tm.height) {
             foreach(c; 0 .. tm.width) {
                 auto t = tm.tiles[r][c];
