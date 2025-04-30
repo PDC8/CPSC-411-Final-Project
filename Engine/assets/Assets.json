@@ -22,13 +22,15 @@
             "play_button_1": [48],
             "play_button_2": [49],
             "ground":   [52],
-            "ladder":   [53],
-            "obstacle": [54],
-            "pbj_idle": [55, 56, 57, 58],
-            "pbj_idle_jump": [59, 60, 61, 62],
-            "pbj_run_right": [63, 64, 65, 66],
-            "pbj_jump_right": [67, 68, 69, 70],
-            "pbj_run_left": [71, 72, 73, 74],
-            "pbj_jump_left": [75, 76, 77, 78],
+            "jelly_ground":   [53],
+            "pb_ground": [54],   
+            "obstacle": [55],
+            "pbj_idle": [56,57,58,59],
+            "pbj_idle_jump": [60,61,62,63],
+            "pbj_run_right": [64,65,66,67],
+            "pbj_jump_right": [68,69,70,71],
+            "pbj_run_left": [72,73,74,75],
+            "pbj_jump_left": [76,77,78,79],
+
       }
 }
