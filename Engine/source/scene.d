@@ -123,6 +123,7 @@ class Level1 : Scene{
         peanutButter.addComponent(new AnimatedTextureComponent(peanutButter, renderer, data));
         peanutButter.addComponent(new PeanutButterScript(peanutButter));
         peanutButter.scriptType = "PeanutButterScript"; // set script type for peanut butter
+        peanutButter.id = 0; // set id for peanut butter
         rootNode.addChild(peanutButter);
 
         //set up jelly object
@@ -132,6 +133,7 @@ class Level1 : Scene{
         jelly.addComponent(new AnimatedTextureComponent(jelly, renderer, data));
         jelly.addComponent(new JellyScript(jelly));
         jelly.scriptType = "JellyScript"; // set script type for jelly
+        jelly.id = 1; // set id for jelly
         rootNode.addChild(jelly);
 
         //set up merged peanut butter jelly object

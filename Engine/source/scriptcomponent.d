@@ -408,8 +408,6 @@ class CollisionManagerScript : ScriptComponent {
 
     void checkPlayerTileCollision(GameObject player, GameObject tile){
         if(tile.isActive){
-            auto transform = player.getComponent!TransformComponent();
-            auto tileTransform = tile.getComponent!TransformComponent();
             auto tileType = tile.getComponent!TileScript().tileType;
             MovementScript playerScript;
             if(player.scriptType == "PeanutButterScript"){
@@ -424,35 +422,54 @@ class CollisionManagerScript : ScriptComponent {
 
             if(checkCollision(player, tile)){
                 if(tileType == "ground"){
-                    if(transform.y < tileTransform.y){ //colision from above
-                        transform.y = tileTransform.y - transform.h;
-                        playerScript.v_velocity = 0;
-                        playerScript.isJump = false;
-                    }
-                    else if(transform.y > tileTransform.y){ //colision from below
-                        transform.y = tileTransform.y + tileTransform.h;
-                        playerScript.v_velocity = 0;
-                    }
-                    else if (transform.x + transform.w > tileTransform.x && transform.x < tileTransform.x) { //collision from left
-                        transform.x = tileTransform.x - transform.w; // prevent overlap from the left
-                        transform.y -= transform.h; //prevent phasing down through tile
+                    groundTile(player, tile, playerScript);
+                }
+
+                else if(tileType == "jelly_ground"){ //jelly tile
+                    groundTile(player, tile, playerScript);
+                    if(player.id == 0){ //peanut butter
                         playerScript.h_velocity = 0;
-                        playerScript.isJump = false; //allow for double jump off side wall
+                        playerScript.isJump = true;
                     }
-                    else if(transform.x > tileTransform.x + 10){ //colision from right
-                        transform.x = tileTransform.x + transform.w;
-                        transform.y -= transform.h; //prevent phasing down through tile
+                }
+                else if (tileType == "pb_ground"){ //pb tile
+                    groundTile(player, tile, playerScript);
+                    if(player.id == 1){ //jelly
                         playerScript.h_velocity = 0;
-                        playerScript.isJump = false; //allow for double jump off side wall
+                        playerScript.isJump = true;
                     }
                 }
                 else if(tileType == "obstacle"){ //obstacle tile
                     player.isActive = false;
                 }
-                else if(tileType == "ladder"){ //ladder tile 
-                
-                }
             }
+        }
+    }
+
+
+    void groundTile(GameObject player, GameObject tile, MovementScript playerScript){
+        auto transform = player.getComponent!TransformComponent();
+        auto tileTransform = tile.getComponent!TransformComponent();
+        if(transform.y < tileTransform.y){ //colision from above
+            transform.y = tileTransform.y - transform.h;
+            playerScript.v_velocity = 0;
+            playerScript.isJump = false;
+        }
+        else if(transform.y > tileTransform.y){ //colision from below
+            transform.y = tileTransform.y + tileTransform.h;
+            playerScript.v_velocity = 0;
+        }
+        else if (transform.x + transform.w > tileTransform.x && transform.x < tileTransform.x) { //collision from left
+            transform.x = tileTransform.x - transform.w; // prevent overlap from the left
+            transform.y -= transform.h; //prevent phasing down through tile
+            playerScript.h_velocity = 0;
+            playerScript.isJump = false; //allow for double jump off side wall
+        }
+        else if(transform.x > tileTransform.x + 10){ //colision from right
+            transform.x = tileTransform.x + transform.w;
+            transform.y -= transform.h; //prevent phasing down through tile
+            playerScript.h_velocity = 0;
+            playerScript.isJump = false; //allow for double jump off side wall
         }
     }
 }

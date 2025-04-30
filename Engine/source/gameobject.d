@@ -13,6 +13,7 @@ class GameObject{
 	IComponent[string] mComponents;
 	bool isActive = true;
 	string scriptType = ""; // Used for movement mixins 
+	int id; // Id if obj is pb(0) or jelly(1)
 
 	// Destructor
 	~this(){
