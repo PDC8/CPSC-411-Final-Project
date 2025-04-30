@@ -431,14 +431,14 @@ class CollisionManagerScript : ScriptComponent {
 
                 else if(tileType == "jelly_ground"){ //jelly tile
                     groundTile(player, tile, playerScript);
-                    if(player.id == 0){ //peanut butter
+                    if(player.id != 1){ //peanut butter
                         playerScript.h_velocity = 0;
                         playerScript.isJump = true;
                     }
                 }
                 else if (tileType == "pb_ground"){ //pb tile
                     groundTile(player, tile, playerScript);
-                    if(player.id == 1){ //jelly
+                    if(player.id != 0){ //jelly
                         playerScript.h_velocity = 0;
                         playerScript.isJump = true;
                     }

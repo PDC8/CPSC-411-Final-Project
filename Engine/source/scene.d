@@ -144,6 +144,7 @@ class Level1 : Scene{
         mergedPeanutButterJelly.addComponent(new MergedPeanutButterJellyScript(mergedPeanutButterJelly));
         mergedPeanutButterJelly.isActive = false; // set to invisible at the start!
         mergedPeanutButterJelly.scriptType = "MergedPeanutButterJellyScript"; // set script type for merged peanut butter jelly
+        mergedPeanutButterJelly.id = 2;
         rootNode.addChild(mergedPeanutButterJelly);
 
 
