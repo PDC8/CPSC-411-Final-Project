@@ -133,6 +133,9 @@ class JellyScript : MovementScript{
             h_velocity += h_acceleration;
         }
         if (keystate[SDL_SCANCODE_UP]){
+            if(isJump){
+                return;
+            }
             v_velocity = jumpVelocity;
             isJump = true;
         }	
@@ -186,10 +189,8 @@ class JellyScript : MovementScript{
                     animated.LoopAnimationSequence("j_run_right");
                 }
             }
-            isJump = false;
-            direction = 0;
-
         }
+        direction = 0;
     }
 }
 
@@ -463,13 +464,13 @@ class CollisionManagerScript : ScriptComponent {
             transform.x = tileTransform.x - transform.w; // prevent overlap from the left
             transform.y -= transform.h; //prevent phasing down through tile
             playerScript.h_velocity = 0;
-            playerScript.isJump = false; //allow for double jump off side wall
+            // playerScript.isJump = false; //allow for double jump off side wall
         }
         else if(transform.x > tileTransform.x + 10){ //colision from right
             transform.x = tileTransform.x + transform.w;
             transform.y -= transform.h; //prevent phasing down through tile
             playerScript.h_velocity = 0;
-            playerScript.isJump = false; //allow for double jump off side wall
+            // playerScript.isJump = false; //allow for double jump off side wall
         }
     }
 }
