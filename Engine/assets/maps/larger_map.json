@@ -1,6 +1,14 @@
 {
   "width": 25,
   "height": 20,
+  "pb_spawn": [
+    18,
+    1
+  ],
+  "j_spawn": [
+    18,
+    3
+  ],
   "tiles": [
     [
       "ground",

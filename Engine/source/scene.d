@@ -1,11 +1,15 @@
 import bindbc.sdl, std.random, std.stdio;
 import scenetree, gameobject, component, scriptcomponent, scenemanager;
+import resourcemanager;
+
+enum TILESIZE = 32; 
 
 abstract class Scene{
     SceneTree tree;
     SDL_Renderer* renderer;
     SceneManager sceneManager;
-    bool gameOver = false;
+    static bool gameOver = false;
+    static bool win = false;
     this(SDL_Renderer* renderer, SceneManager sceneManager){
         this.renderer = renderer;
         this.sceneManager = sceneManager;
@@ -15,8 +19,8 @@ abstract class Scene{
 
 class MainMenu : Scene{
     immutable int size = 200;
-    int buttonX = 320 - (size / 2);
-    int buttonY = 240 - (size / 2);
+    int buttonX = 400 - (size / 2);
+    int buttonY = 320 - (size / 2);
     this(SDL_Renderer* renderer, SceneManager sceneManager, string image, string data){
         super(renderer, sceneManager);
         setUpScene(image, data);
@@ -46,12 +50,59 @@ class MainMenu : Scene{
     }
 }
 
+class Win : Scene{
+    immutable int size = 200;
+    this(SDL_Renderer* renderer, SceneManager sceneManager, string image, string data){
+        super(renderer, sceneManager);
+        setUpScene(image, data);
+    }
+
+    override void setUpScene(string image, string data){
+
+        //make our root node for scene tree
+        GameObject rootNode = new GameObject();
+        tree.setRoot(rootNode);
+
+        //background object
+        GameObject bg = new GameObject();
+        bg.addComponent(new TransformComponent(bg, 0, 0, 1136, 640));
+        bg.addComponent(new TextureComponent(bg, renderer, "./assets/Background.bmp"));
+        bg.addComponent(new AnimatedTextureComponent(bg, renderer, "./assets/Background.json"));
+        bg.addComponent(new BgScript(bg));
+        rootNode.addChild(bg);
+    }
+}
+
+class GameOver : Scene{
+    immutable int size = 200;
+    this(SDL_Renderer* renderer, SceneManager sceneManager, string image, string data){
+        super(renderer, sceneManager);
+        setUpScene(image, data);
+    }
+
+    override void setUpScene(string image, string data){
+
+        //make our root node for scene tree
+        GameObject rootNode = new GameObject();
+        tree.setRoot(rootNode);
+
+        //background object
+        GameObject bg = new GameObject();
+        bg.addComponent(new TransformComponent(bg, 0, 0, 1136, 640));
+        bg.addComponent(new TextureComponent(bg, renderer, "./assets/Background.bmp"));
+        bg.addComponent(new AnimatedTextureComponent(bg, renderer, "./assets/Background.json"));
+        bg.addComponent(new BgScript(bg));
+        rootNode.addChild(bg);
+    }
+}
+
 
 class Level1 : Scene{
     int PB_X = 0;
     int PB_Y = 0;
     int J_X = 0;
     int J_Y = 0;
+    int starCount = 0;
     this(SDL_Renderer* renderer, SceneManager sceneManager, string image, string data){
         super(renderer, sceneManager);
         setUpScene(image, data);
@@ -69,13 +120,11 @@ class Level1 : Scene{
         bg.addComponent(new AnimatedTextureComponent(bg, renderer, "./assets/Background.json"));
         bg.addComponent(new BgScript(bg));
         rootNode.addChild(bg);
-        
-        writeln("HGELP");
 
         //set up tiles container
         GameObject tilesContainer = new GameObject();
         rootNode.addChild(tilesContainer);
-        auto tm = ResourceManager.GetInstance().LoadTileMap("./assets/maps/map.json");
+        auto tm = ResourceManager.GetInstance().LoadTileMap("./assets/maps/larger_map.json");
         PB_X = tm.pb_spawn[1] * TILESIZE;
         PB_Y = tm.pb_spawn[0] * TILESIZE;
         J_X = tm.j_spawn[1] * TILESIZE;
@@ -94,31 +143,11 @@ class Level1 : Scene{
 
                     tilesContainer.addChild(tileObj);
                 }
+                if(t == "star") {
+                    starCount++; 
+                }
             }
         }
-
-        
-        // //background object
-        // GameObject bg = new GameObject();
-        // bg.addComponent(new TransformComponent(bg, 0, 0, 640, 640));
-        // bg.addComponent(new TextureComponent(bg, renderer, "./assets/Background.bmp"));
-        // bg.addComponent(new AnimatedTextureComponent(bg, renderer, "./assets/Background.json"));
-        // bg.addComponent(new BgScript(bg));
-        // rootNode.addChild(bg);
-
-
-        // //camera object
-        // GameObject camera = new GameObject();
-        // camera.addComponent(new TransformComponent(camera, 0, 0, 0, 0));
-        // camera.addComponent(new CameraScript(camera, spaceShip));
-        // rootNode.addChild(camera);
-
-        // //worldContainer
-        // GameObject worldContainer = new GameObject();
-        // worldContainer.addComponent(new TransformComponent(worldContainer, 0, 0, 0, 0)); //allow transform inheritance
-        // worldContainer.addComponent(new WorldContainerScript(worldContainer));
-        // camera.addChild(worldContainer);
-
 
         //set up peanut butter object
         GameObject peanutButter = new GameObject();
@@ -126,21 +155,43 @@ class Level1 : Scene{
         peanutButter.addComponent(new TextureComponent(peanutButter, renderer, image));
         peanutButter.addComponent(new AnimatedTextureComponent(peanutButter, renderer, data));
         peanutButter.addComponent(new PeanutButterScript(peanutButter));
+        peanutButter.scriptType = "PeanutButterScript"; // set script type for peanut butter
+        peanutButter.id = 0; // set id for peanut butter
         rootNode.addChild(peanutButter);
-        
+
         //set up jelly object
         GameObject jelly = new GameObject();
         jelly.addComponent(new TransformComponent(jelly, J_X, J_Y, 32, 32));
         jelly.addComponent(new TextureComponent(jelly, renderer, image));
         jelly.addComponent(new AnimatedTextureComponent(jelly, renderer, data));
         jelly.addComponent(new JellyScript(jelly));
+        jelly.scriptType = "JellyScript"; // set script type for jelly
+        jelly.id = 1; // set id for jelly
         rootNode.addChild(jelly);
 
+        //set up merged peanut butter jelly object
+        GameObject mergedPeanutButterJelly = new GameObject();
+        mergedPeanutButterJelly.addComponent(new TransformComponent(mergedPeanutButterJelly, J_X, J_Y, 32, 32));
+        mergedPeanutButterJelly.addComponent(new TextureComponent(mergedPeanutButterJelly, renderer, image));
+        mergedPeanutButterJelly.addComponent(new AnimatedTextureComponent(mergedPeanutButterJelly, renderer, data));
+        mergedPeanutButterJelly.addComponent(new MergedPeanutButterJellyScript(mergedPeanutButterJelly));
+        mergedPeanutButterJelly.isActive = false; // set to invisible at the start!
+        mergedPeanutButterJelly.scriptType = "MergedPeanutButterJellyScript"; // set script type for merged peanut butter jelly
+        mergedPeanutButterJelly.id = 2;
+        rootNode.addChild(mergedPeanutButterJelly);
 
-        //collision manager
-        // GameObject collisionManager = new GameObject();
-        // collisionManager.addComponent(new CollisionManagerScript(collisionManager, peanutButter, jelly, tilesContainer));
-        // rootNode.addChild(collisionManager);
+
+        // // uncomment to enable feature where peanut butter and jelly can "merge" by pressing space key
+        // // merge manager
+        // GameObject mergeManager = new GameObject();
+        // mergeManager.addComponent(new MergeManagerScript(mergeManager, peanutButter, jelly, mergedPeanutButterJelly));
+        // rootNode.addChild(mergeManager);
+
+
+        // collision manager
+        GameObject collisionManager = new GameObject();
+        collisionManager.addComponent(new CollisionManagerScript(collisionManager, peanutButter, jelly, mergedPeanutButterJelly, tilesContainer, this, starCount));
+        rootNode.addChild(collisionManager);
 
         // //game manager
         // GameObject gameManager = new GameObject();
