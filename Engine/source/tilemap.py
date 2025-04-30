@@ -4,7 +4,7 @@ from PIL import Image, ImageTk, ImageDraw
 import json
 
 TILESIZE = 32
-TILE_TYPES = ['ground', 'ladder', 'obstacle']
+TILE_TYPES = ['ground', 'jelly_ground', 'pb_ground', 'obstacle']
 
 class TileMapEditor:
     def __init__(self, gui, screen_width, screen_height):
@@ -52,28 +52,44 @@ class TileMapEditor:
         self.tilemap = [[None for _ in range(self.map_cols)] for _ in range(self.map_rows)]
 
     def create_tile_images(self):
-        for t in TILE_TYPES:
-            img = Image.new("RGBA", (TILESIZE, TILESIZE), (0,0,0,0))
-            draw = ImageDraw.Draw(img)
-            if t == 'ground':
-                color = (34,139,34)
-            elif t == 'ladder':
-                color = (0,0,0)
-            else:
-                color = (139,69,19)
-            draw.rectangle([0,0,TILESIZE,TILESIZE], fill=color, outline="black")
-            self.tile_images[t] = ImageTk.PhotoImage(img)
+        spritesheet = Image.open("../assets/Tiles.png").convert("RGBA")  # Your full tile image
+        self.tile_images = {}
+        
+        for index, t in enumerate(TILE_TYPES):
+            x0 = index * TILESIZE
+            y0 = 0
+            x1 = x0 + TILESIZE
+            y1 = y0 + TILESIZE
+
+            tile_img = spritesheet.crop((x0, y0, x1, y1))
+            self.tile_images[t] = ImageTk.PhotoImage(tile_img)
+
+
+
+
+
+        # for t in TILE_TYPES:
+        #     img = Image.new("RGBA", (TILESIZE, TILESIZE), (0,0,0,0))
+        #     draw = ImageDraw.Draw(img)
+        #     if t == 'ground':
+        #         color = (34,139,34)
+        #     elif t == 'ladder':
+        #         color = (0,0,0)
+        #     else:
+        #         color = (139,69,19)
+        #     draw.rectangle([0,0,TILESIZE,TILESIZE], fill=color, outline="black")
+        #     self.tile_images[t] = ImageTk.PhotoImage(img)
 
     def draw_atlas(self):
         self.atlas_canvas.delete("all")
         for idx, t in enumerate(TILE_TYPES):
             img = self.tile_images[t]
-            self.atlas_canvas.create_image(idx*TILESIZE, 0, image=img, anchor='nw')
+            self.atlas_canvas.create_image(idx * TILESIZE, 0, image=img, anchor='nw')
             if t == self.selected_tile:
                 self.atlas_canvas.create_rectangle(
                     idx*TILESIZE, 0,
                     (idx+1)*TILESIZE, TILESIZE,
-                    outline="red", width=2
+                    outline="red", width=3
                 )
 
     def atlas_click(self, event):
