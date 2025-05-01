@@ -200,6 +200,7 @@ class MergedPeanutButterJellyScript : MovementScript{
     this(GameObject owner){
 		super(owner);
         this.jumpVelocity = -15;
+        this.h_maxSpeed = 4;
     }
     override void Input(){
         ubyte* keystate = SDL_GetKeyboardState(null);
