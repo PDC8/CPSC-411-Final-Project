@@ -146,6 +146,12 @@ class TileMapEditor:
         path = fd.asksaveasfilename(defaultextension=".json", filetypes=[("JSON","*.json")])
         if not path:
             return
+        
+        # Check to make sure pb and jelly aren't in tilemap
+        for r in range(self.map_rows):
+            for c in range(self.map_cols):
+                if self.tilemap[r][c] == 'jelly' or self.tilemap[r][c] == 'pb':
+                    self.tilemap[r][c] = None
         data = {
             "width": self.map_cols,
             "height": self.map_rows,
