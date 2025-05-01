@@ -27,6 +27,7 @@ class SceneManager{
     void switchScene(string sceneName){
         if(sceneName in queuedScenes){
             currentScene = queuedScenes[sceneName];
+            currentScene.resetPos();
         }
         else{
             writeln("Error: Scene doesn't exist");

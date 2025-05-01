@@ -278,9 +278,11 @@ class ButtonScript : ScriptComponent{
     private bool hover;
     private bool click;
     private SceneManager sceneManager;
-    this(GameObject owner, SceneManager sceneManager){
+    string animationName;
+    this(GameObject owner, SceneManager sceneManager, string animationName){
         super(owner);
         this.sceneManager = sceneManager;
+        this.animationName = animationName;
     }
 
     override void Input(){
@@ -309,10 +311,10 @@ class ButtonScript : ScriptComponent{
         }
         else{
             if(hover){
-                animated.StillAnimation("play_button_2");
+                animated.StillAnimation(animationName ~ "_2");
             }
             else{
-                animated.StillAnimation("play_button_1");
+                animated.StillAnimation(animationName ~ "_1");
             }
         }
     }
@@ -449,9 +451,13 @@ class CollisionManagerScript : ScriptComponent {
                     }
                 }
                 else if(tileType == "obstacle"){ //obstacle tile
-                    if(player.isActive) {
-                        playerCount -= 1;
-                        if(playerCount == 0) {
+                    if(player.id != 2) { //not merged
+                        if(!player.isActive) {
+                            SceneManager.currentScene.gameOver = true;
+                        }
+                    }
+                    else{
+                        if(!player.isActive) {
                             SceneManager.currentScene.gameOver = true;
                         }
                     }
@@ -498,9 +504,11 @@ class CollisionManagerScript : ScriptComponent {
     }
 }
 
-class BgScript : ScriptComponent{
-    this(GameObject owner){
+class StaticScript : ScriptComponent{
+    string animationName;
+    this(GameObject owner, string animationName){
         super(owner);
+        this.animationName = animationName;
     }
 
     override void Render(){
@@ -509,7 +517,7 @@ class BgScript : ScriptComponent{
             return;
         }
         else{
-            animated.StillAnimation("background");
+            animated.StillAnimation(animationName);
         }
     }
 }

@@ -2,7 +2,7 @@
     "filepath":"./Assets.bmp",
       "format":{
             "width" : 128,
-            "height": 640,
+            "height": 672,
             "tileWidth"	: 32,
             "tileHeight": 32,
       },
@@ -32,6 +32,9 @@
             "pbj_jump_right": [68,69,70,71],
             "pbj_run_left": [72,73,74,75],
             "pbj_jump_left": [76,77,78,79],
+            "you_win": [80],
+            "game_over_1": [81],
+            "game_over_2": [82],
 
       }
 }
